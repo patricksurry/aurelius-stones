@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meditations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --stone-bg: #faf8f3;
+      --stone-claimed-bg: #fdfcf9;
+      --stone-under-bg: #ebe6da;
+      --ink: #24221e;
+      --ink-mid: #625d53;
+      --ink-faint: #a69f92;
+      --ink-greek: #b5afa2;
+      --stone-fill-claimed: #9a7b66;
+      --stone-border-claimed: #c9b6a7;
+      --hairline: #e4dfd3;
+      --font: 'EB Garamond', Georgia, serif;
+    }
+
+    [data-theme="night"] {
+      --bg: #141311;
+      --stone-bg: #1c1b18;
+      --stone-claimed-bg: #211f1b;
+      --stone-under-bg: #181714;
+      --ink: #e6e1d6;
+      --ink-mid: #9a9488;
+      --ink-faint: #59554d;
+      --ink-greek: #4d4942;
+      --stone-fill-claimed: #a6826b;
+      --stone-border-claimed: #4a3d34;
+      --hairline: #2b2924;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.75rem 1.5rem 5rem;
+      transition: background 0.4s ease, color 0.4s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =====================================================
+       TOP HORIZON: SIMPLE HORIZONTAL SCROLLING LINEAR RAIL
+       ===================================================== */
+    .horizon {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+      gap: 1rem;
+    }
+
+    .books-rail {
+      display: flex;
+      align-items: center;
+      gap: 1.15rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      flex: 1;
+      padding: 0.45rem 0.25rem;
+      scrollbar-width: none;
+      mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+    }
+
+    .books-rail::-webkit-scrollbar {
+      display: none;
+    }
+
+    .book-cluster {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.32rem;
+      flex-shrink: 0;
+    }
+
+    .book-numeral {
+      font-size: 0.78rem;
+      line-height: 1;
+      color: var(--ink-faint);
+      letter-spacing: 0.03em;
+      margin-right: 0.1rem;
+      user-select: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .book-numeral:hover,
+    .book-cluster.active-book .book-numeral {
+      color: var(--ink);
+    }
+
+    .ribbon-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--ink-faint);
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      opacity: 0.72;
+      transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+    }
+
+    .ribbon-dot:hover {
+      transform: scale(1.55);
+      border-color: var(--ink);
+      opacity: 1;
+    }
+
+    /* Claimed stone's verse: subtle warm stone fill */
+    .ribbon-dot.claimed {
+      background: var(--stone-fill-claimed);
+      border-color: var(--stone-fill-claimed);
+      opacity: 0.85;
+    }
+
+    /* Other verses resting on the currently active stone */
+    .ribbon-dot.same-stone {
+      border-color: var(--ink);
+      opacity: 1;
+      transform: scale(1.25);
+    }
+
+    /* Current verse */
+    .ribbon-dot.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      opacity: 1;
+      transform: scale(1.55);
+    }
+
+    .quiet-btn {
+      background: none;
+      border: none;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      color: var(--ink-faint);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.2s ease;
+    }
+
+    .quiet-btn:hover {
+      color: var(--ink);
+    }
+
+    /* =====================================================
+       UNFILLED / FILLED STONE ELLIPSE BADGE (CARDS)
+       ===================================================== */
+    .stone-ellipse {
+      display: inline-block;
+      width: 16px;
+      height: 11px;
+      border-radius: 52% 48% 54% 46% / 48% 54% 46% 52%;
+      border: 1.25px solid var(--ink-faint);
+      background: transparent;
+      flex-shrink: 0;
+      cursor: pointer;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    }
+
+    .stone-ellipse:hover {
+      border-color: var(--ink-mid);
+      transform: scale(1.1);
+    }
+
+    .stone-ellipse.claimed {
+      background: var(--stone-fill-claimed);
+      border-color: var(--stone-fill-claimed);
+    }
+
+    .stone-ellipse.mini {
+      width: 11px;
+      height: 7.5px;
+      border-width: 1.1px;
+      cursor: inherit;
+    }
+
+    /* =====================================================
+       THE MAIN STONE (WITH INTERNAL VERSE SCROLLING)
+       ===================================================== */
+    .stone-wrapper {
+      width: 100%;
+      max-width: 780px;
+    }
+
+    .stone {
+      background: var(--stone-bg);
+      border: 1px solid var(--hairline);
+      border-radius: 26px 30px 24px 28px;
+      padding: 2.75rem 3.25rem 2rem;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.035);
+      transition: background 0.35s ease, border-color 0.35s ease;
+      position: relative;
+    }
+
+    .stone.claimed {
+      background: var(--stone-claimed-bg);
+      border-color: var(--stone-border-claimed);
+    }
+
+    .stone.underside {
+      background: var(--stone-under-bg);
+    }
+
+    /* Maxim Input: "Pencil Sketch" when unclaimed, "Carved Ink" when yours */
+    .maxim-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .maxim-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed var(--hairline);
+      font-family: var(--font);
+      font-size: 1.85rem;
+      line-height: 1.32;
+      color: var(--ink-faint);
+      font-style: italic;
+      resize: none;
+      overflow: hidden;
+      outline: none;
+      padding: 0.1rem 0 0.3rem;
+      transition: color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .maxim-input:hover,
+    .maxim-input:focus {
+      color: var(--ink);
+      border-bottom-color: var(--stone-fill-claimed);
+    }
+
+    .stone.claimed .maxim-input {
+      color: var(--ink);
+      font-style: normal;
+      border-bottom-color: transparent;
+    }
+
+    .stone.claimed .maxim-input:hover,
+    .stone.claimed .maxim-input:focus {
+      border-bottom-color: var(--hairline);
+    }
+
+    /* Original Summary Whisper (only revealed when toggled via stone ellipse on a claimed stone) */
+    .original-summary-whisper {
+      display: none;
+      font-size: 0.96rem;
+      font-style: italic;
+      color: var(--ink-faint);
+      margin-top: 0.35rem;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .original-summary-whisper.open {
+      display: flex;
+    }
+
+    .reflection-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      font-family: var(--font);
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: var(--ink-mid);
+      margin-top: 0.5rem;
+      resize: none;
+      overflow: hidden;
+      outline: none;
+    }
+
+    .reflection-input::placeholder {
+      color: var(--ink-faint);
+      font-style: italic;
+      opacity: 0.65;
+    }
+
+    /* Hairline Separator */
+    .divider {
+      height: 1px;
+      background: var(--hairline);
+      margin: 1.5rem 0 1.25rem;
+    }
+
+    /* Scrollable Verses Region Inside the Stone */
+    .verses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.65rem;
+      max-height: 44vh;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      padding-bottom: 0.75rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--hairline) transparent;
+    }
+
+    .verses-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .verses-list::-webkit-scrollbar-thumb {
+      background-color: var(--hairline);
+      border-radius: 999px;
+    }
+
+    .verse-row {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 2rem;
+      align-items: baseline;
+      transition: opacity 0.25s ease;
+      cursor: pointer;
+    }
+
+    .verse-row.companion {
+      opacity: 0.42;
+    }
+
+    .verse-row.companion:hover {
+      opacity: 0.85;
+    }
+
+    .verse-english {
+      font-size: 1.22rem;
+      line-height: 1.66;
+      color: var(--ink);
+    }
+
+    /* Subtle dotted underline on phrases that have a note on the flipside */
+    .under-link {
+      border-bottom: 1px dotted var(--ink-faint);
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .under-link:hover {
+      border-bottom-color: var(--ink);
+      border-bottom-style: solid;
+    }
+
+    .verse-ref {
+      font-size: 0.85rem;
+      color: var(--ink-faint);
+      margin-right: 0.55rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .verse-row.active-verse .verse-ref {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .verse-greek {
+      font-size: 0.9rem;
+      line-height: 1.62;
+      color: var(--ink-greek);
+      user-select: text;
+      transition: color 0.25s ease;
+    }
+
+    .verse-row:hover .verse-greek {
+      color: var(--ink-mid);
+    }
+
+    /* Subtle Flip Icon Below the Greek Column */
+    .flip-corner {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.75rem;
+    }
+
+    .flip-icon-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 1.4rem;
+      color: var(--ink-greek);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .flip-icon-btn:hover {
+      color: var(--ink);
+      border-color: var(--hairline);
+      transform: rotate(25deg);
+    }
+
+    /* =====================================================
+       UNDERSIDE OF THE STONE (TRANSLATION & GREEK NOTES)
+       ===================================================== */
+    .underside-title {
+      font-size: 1.35rem;
+      font-style: italic;
+      color: var(--ink-mid);
+      margin-bottom: 1.5rem;
+    }
+
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-height: 46vh;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--hairline) transparent;
+    }
+
+    .note-item {
+      padding: 0.85rem 1rem 1.25rem;
+      margin: 0 -1rem;
+      border-radius: 12px;
+      border-bottom: 1px solid var(--hairline);
+      transition: background 0.3s ease;
+    }
+
+    .note-item:last-child {
+      border-bottom: none;
+    }
+
+    .note-item.focused-note {
+      background: color-mix(in srgb, var(--stone-fill-claimed) 12%, transparent);
+    }
+
+    .note-head {
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .note-head span {
+      color: var(--ink-mid);
+      font-style: italic;
+    }
+
+    .note-comparisons {
+      font-size: 1.02rem;
+      color: var(--ink-mid);
+      margin: 0.45rem 0;
+      font-style: italic;
+    }
+
+    .note-body {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    /* =====================================================
+       BELOW THE STONE:
+       ROW 1 = PREV / BLANK / NEXT
+       SUBSEQUENT ROWS = ALL STONES BY RELATEDNESS
+       ===================================================== */
+    .stone-garden {
+      width: 100%;
+      max-width: 780px;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .garden-row-nav {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .garden-grid-related {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .mini-stone {
+      min-width: 0;
+      width: 100%;
+      overflow: hidden;
+      background: var(--stone-bg);
+      border: 1px solid var(--hairline);
+      border-radius: 16px 19px 15px 18px;
+      padding: 0.95rem 1.1rem;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font);
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.45rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.02);
+    }
+
+    .mini-stone:hover {
+      transform: translateY(-2px);
+      border-color: var(--ink-faint);
+    }
+
+    .mini-stone.claimed {
+      background: var(--stone-claimed-bg);
+      border-color: var(--stone-border-claimed);
+    }
+
+    .mini-stone-top {
+      min-width: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    .mini-stone-refs {
+      min-width: 0;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-stone-title {
+      font-size: 1.04rem;
+      line-height: 1.32;
+      color: var(--ink-faint);
+      font-style: italic;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mini-stone.claimed .mini-stone-title {
+      color: var(--ink);
+      font-style: normal;
+    }
+
+    @media (max-width: 680px) {
+      .stone {
+        padding: 1.75rem 1.5rem 1.5rem;
+      }
+      .verse-row {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+      }
+      .garden-row-nav,
+      .garden-grid-related {
+        grid-template-columns: 1fr;
+      }
+      .blank-slot {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HORIZON: SIMPLE HORIZONTAL SCROLLING LINEAR RAIL -->
+  <header class="horizon">
+    <div class="books-rail" id="booksBreadcrumbs"></div>
+    <button class="quiet-btn" id="themeToggle" title="Day / Night">☾</button>
+  </header>
+
+  <!-- THE MAIN STONE -->
+  <main class="stone-wrapper">
+    <article class="stone" id="stoneSurface"></article>
+  </main>
+
+  <!-- MINI-STONE GARDEN: ROW 1 (PREV / BLANK / NEXT), THEN ALL STONES BY RELATEDNESS -->
+  <nav class="stone-garden">
+    <div class="garden-row-nav" id="navRow"></div>
+    <div class="garden-grid-related" id="relatedGrid"></div>
+  </nav>
+
+  <!-- FULL 12-BOOK, 488-VERSE, 48-STONE DATASET -->
+  <script src="data/meditations.js"></script>
+  <script>
+    const DATA = window.MEDITATIONS_DATA;
+    const BOOKS = DATA.books;
+    const STONES = DATA.stones;
+    const VERSES = DATA.verses;
+
+    const STONE_BY_ID = Object.fromEntries(STONES.map(s => [s.id, s]));
+    const VERSE_BY_ID = Object.fromEntries(VERSES.map(v => [v.id, v]));
+
+    // Seed two starter claimed stones so the user immediately sees the unfilled vs. filled stone dynamic
+    const SEED_CLAIMED = {
+      'stone-13': {
+        maxim: 'Before saying yes to anything today, ask: "Is this actually necessary?"',
+        reflection: 'Eliminate unnecessary thoughts first, so unnecessary actions don’t follow.'
+      },
+      'stone-05': {
+        maxim: 'I am allowed to hold zero opinion on 90% of the noise I encounter today.',
+        reflection: ''
+      }
+    };
+
+    let state = {
+      currentVerseRef: 'IV.24',
+      currentStoneId: 'stone-13',
+      flipped: false,
+      focusedNoteKey: null,
+      showOriginalMaxim: false,
+      claimed: JSON.parse(localStorage.getItem('meditations_full_v1') || JSON.stringify(SEED_CLAIMED))
+    };
+
+    function save() {
+      localStorage.setItem('meditations_full_v1', JSON.stringify(state.claimed));
+    }
+
+    function isClaimed(stoneId) {
+      const stone = STONE_BY_ID[stoneId];
+      if (!stone) return false;
+      const c = state.claimed[stoneId];
+      return Boolean(c && ((c.maxim && c.maxim.trim() && c.maxim.trim() !== stone.defaultMaxim) || (c.reflection && c.reflection.trim())));
+    }
+
+    function getStoneHeadline(stone) {
+      const c = state.claimed[stone.id];
+      return (c && c.maxim && c.maxim.trim()) ? c.maxim : stone.defaultMaxim;
+    }
+
+    function autoResize(el) {
+      if (!el) return;
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    function renderBreadcrumbs(activeStone, scrollActiveIntoView = false) {
+      const booksMap = new Map();
+      VERSES.forEach(v => {
+        if (!booksMap.has(v.book)) booksMap.set(v.book, []);
+        booksMap.get(v.book).push(v);
+      });
+
+      const activeVerse = VERSE_BY_ID[state.currentVerseRef];
+      const container = document.getElementById('booksBreadcrumbs');
+
+      container.innerHTML = BOOKS.map(bObj => {
+        const verses = booksMap.get(bObj.book) || [];
+        const isActiveBook = activeVerse && activeVerse.book === bObj.book;
+        const firstRef = verses[0] ? verses[0].id : 'I.1';
+        return `
+          <div class="book-cluster ${isActiveBook ? 'active-book' : ''}">
+            <span class="book-numeral" onclick="goToVerse('${firstRef}')" title="Book ${bObj.roman}: ${bObj.title}">${bObj.roman}</span>
+            ${verses.map(v => {
+              const isCurrent = v.id === state.currentVerseRef;
+              const sameStone = v.stoneId === activeStone.id && !isCurrent;
+              const c = isClaimed(v.stoneId);
+              return `<button class="ribbon-dot ${c ? 'claimed' : ''} ${sameStone ? 'same-stone' : ''} ${isCurrent ? 'active' : ''}"
+                      id="rail-dot-${v.id}"
+                      onclick="goToVerse('${v.id}')"
+                      title="${v.id}"></button>`;
+            }).join('')}
+          </div>
+        `;
+      }).join('');
+
+      if (scrollActiveIntoView) {
+        const activeDot = document.getElementById(`rail-dot-${state.currentVerseRef}`);
+        if (activeDot) {
+          const railRect = container.getBoundingClientRect();
+          const dotRect = activeDot.getBoundingClientRect();
+          const targetScrollLeft = container.scrollLeft + (dotRect.left - railRect.left) - (railRect.width / 2) + (dotRect.width / 2);
+          container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+        }
+      }
+    }
+
+    function render(scrollRail = true) {
+      const stone = STONE_BY_ID[state.currentStoneId] || STONES[0];
+      const claimed = isClaimed(stone.id);
+      const user = state.claimed[stone.id] || {};
+      const hasCustomMaxim = Boolean(user.maxim && user.maxim.trim() && user.maxim.trim() !== stone.defaultMaxim);
+
+      renderBreadcrumbs(stone, scrollRail);
+
+      // Verses resting on this stone: active verse first, companion verses on the same stone right underneath
+      const stoneVerses = stone.verseIds.map(id => VERSE_BY_ID[id]).filter(Boolean);
+      const activeV = stoneVerses.find(v => v.id === state.currentVerseRef) || stoneVerses[0];
+      const orderedVerses = [
+        activeV,
+        ...stoneVerses.filter(v => v.id !== activeV.id)
+      ];
+
+      const surface = document.getElementById('stoneSurface');
+      surface.className = `stone ${claimed ? 'claimed' : ''} ${state.flipped ? 'underside' : ''}`;
+
+      if (!state.flipped) {
+        const displayMaxim = getStoneHeadline(stone);
+
+        surface.innerHTML = `
+          <div class="maxim-row">
+            <textarea id="maximField" class="maxim-input" rows="1"
+                      placeholder="${escapeHtml(stone.defaultMaxim)}">${escapeHtml(displayMaxim)}</textarea>
+            <button class="stone-ellipse ${claimed ? 'claimed' : ''}" id="stoneBadgeBtn"
+                    title="${hasCustomMaxim ? 'Claimed stone — click to peek at original summary' : 'Unclaimed stone — rewrite summary in your own words to claim'}"></button>
+          </div>
+
+          <div class="original-summary-whisper ${state.showOriginalMaxim && hasCustomMaxim ? 'open' : ''}" id="originalWhisper">
+            <span>Original: “${escapeHtml(stone.defaultMaxim)}”</span>
+            <button class="quiet-btn" onclick="restoreDefaultMaxim('${stone.id}')">restore</button>
+          </div>
+
+          <textarea id="reflectionField" class="reflection-input" rows="1"
+                    placeholder="${claimed ? 'Add a note...' : 'Rewrite the summary above in your own words, or add a note...'}">${escapeHtml(user.reflection || '')}</textarea>
+
+          <div class="divider"></div>
+
+          <div class="verses-list" id="versesListScroll">
+            ${orderedVerses.map((v, idx) => `
+              <div class="verse-row ${idx === 0 ? 'active-verse' : 'companion'}" onclick="goToVerse('${v.id}')">
+                <div class="verse-english">
+                  <span class="verse-ref">${v.id}</span>${v.english}
+                </div>
+                <div class="verse-greek">${v.greek}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="flip-corner">
+            <button class="flip-icon-btn" onclick="flipStone(null)" title="Turn stone over (translation &amp; Greek notes)">↻</button>
+          </div>
+        `;
+
+        // Dotted phrase links flip the stone and highlight that specific note on the underside
+        surface.querySelectorAll('.under-link').forEach(el => {
+          el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const noteKey = el.getAttribute('data-note');
+            flipStone(noteKey);
+          });
+        });
+
+        const maximField = document.getElementById('maximField');
+        const reflectionField = document.getElementById('reflectionField');
+        const stoneBadgeBtn = document.getElementById('stoneBadgeBtn');
+        autoResize(maximField);
+        autoResize(reflectionField);
+
+        stoneBadgeBtn.addEventListener('click', () => {
+          if (isClaimed(stone.id)) {
+            state.showOriginalMaxim = !state.showOriginalMaxim;
+            render(false);
+          } else {
+            maximField.focus();
+            maximField.select();
+          }
+        });
+
+        const handleInput = () => {
+          autoResize(maximField);
+          autoResize(reflectionField);
+          const mVal = maximField.value.trim();
+          const rVal = reflectionField.value.trim();
+          const changedMaxim = mVal && mVal !== stone.defaultMaxim;
+          if (changedMaxim || rVal) {
+            state.claimed[stone.id] = {
+              maxim: mVal || stone.defaultMaxim,
+              reflection: rVal
+            };
+          } else {
+            delete state.claimed[stone.id];
+          }
+          save();
+          const nowClaimed = isClaimed(stone.id);
+          surface.classList.toggle('claimed', nowClaimed);
+          stoneBadgeBtn.classList.toggle('claimed', nowClaimed);
+          renderBreadcrumbs(stone, false);
+          renderGarden(stone);
+        };
+
+        maximField.addEventListener('input', handleInput);
+        reflectionField.addEventListener('input', handleInput);
+
+      } else {
+        // UNDERSIDE OF THE STONE
+        surface.innerHTML = `
+          <div class="underside-title">“${escapeHtml(getStoneHeadline(stone))}”</div>
+
+          <div class="notes-list" id="notesListScroll">
+            ${stone.underside.map(n => `
+              <div class="note-item ${state.focusedNoteKey === n.key ? 'focused-note' : ''}" id="under-note-${n.key}">
+                <div class="note-head">${n.phrase} — <span>${n.greek}</span></div>
+                <div class="note-comparisons">${n.comparisons}</div>
+                <div class="note-body">${n.note}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="flip-corner">
+            <button class="flip-icon-btn" onclick="flipStone(null)" title="Turn stone back over">↺</button>
+          </div>
+        `;
+      }
+
+      renderGarden(stone);
+    }
+
+    function renderGarden(currentStone) {
+      const idx = VERSES.findIndex(v => v.id === state.currentVerseRef);
+      const prevVerse = VERSES[(idx - 1 + VERSES.length) % VERSES.length];
+      const nextVerse = VERSES[(idx + 1) % VERSES.length];
+
+      const prevStone = STONE_BY_ID[prevVerse.stoneId];
+      const nextStone = STONE_BY_ID[nextVerse.stoneId];
+
+      // ROW 1: Prev / Blank / Next
+      const navRow = document.getElementById('navRow');
+      navRow.innerHTML = `
+        <button class="mini-stone ${isClaimed(prevStone.id) ? 'claimed' : ''}" id="prevMiniCard">
+          <div class="mini-stone-top">
+            <span class="mini-stone-refs">← ${prevVerse.id}</span>
+            <span class="stone-ellipse mini ${isClaimed(prevStone.id) ? 'claimed' : ''}"></span>
+          </div>
+          <span class="mini-stone-title">${escapeHtml(getStoneHeadline(prevStone))}</span>
+        </button>
+
+        <div class="blank-slot"></div>
+
+        <button class="mini-stone ${isClaimed(nextStone.id) ? 'claimed' : ''}" id="nextMiniCard">
+          <div class="mini-stone-top">
+            <span class="mini-stone-refs">${nextVerse.id} →</span>
+            <span class="stone-ellipse mini ${isClaimed(nextStone.id) ? 'claimed' : ''}"></span>
+          </div>
+          <span class="mini-stone-title">${escapeHtml(getStoneHeadline(nextStone))}</span>
+        </button>
+      `;
+
+      document.getElementById('prevMiniCard').addEventListener('click', () => goToVerse(prevVerse.id));
+      document.getElementById('nextMiniCard').addEventListener('click', () => goToVerse(nextVerse.id));
+
+      // SUBSEQUENT ROWS: All other 47 stones ordered by degree of relatedness to currentStone
+      const orderedRelatedIds = currentStone.affinity || [];
+      const relatedStones = orderedRelatedIds
+        .map(id => STONE_BY_ID[id])
+        .filter(s => s && s.id !== currentStone.id);
+
+      const relatedGrid = document.getElementById('relatedGrid');
+      relatedGrid.innerHTML = relatedStones.map((s) => {
+        const claimed = isClaimed(s.id);
+        const verseListStr = s.verseIds.join(', ');
+        return `
+          <button class="mini-stone ${claimed ? 'claimed' : ''}" data-stone-id="${s.id}">
+            <div class="mini-stone-top">
+              <span class="mini-stone-refs" title="${verseListStr}">${verseListStr}</span>
+              <span class="stone-ellipse mini ${claimed ? 'claimed' : ''}"></span>
+            </div>
+            <span class="mini-stone-title">${escapeHtml(getStoneHeadline(s))}</span>
+          </button>
+        `;
+      }).join('');
+
+      relatedGrid.querySelectorAll('.mini-stone').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = STONE_BY_ID[btn.getAttribute('data-stone-id')];
+          if (target && target.verseIds.length) goToVerse(target.verseIds[0]);
+        });
+      });
+    }
+
+    function restoreDefaultMaxim(stoneId) {
+      const stone = STONE_BY_ID[stoneId];
+      const entry = state.claimed[stoneId];
+      if (entry && stone) {
+        entry.maxim = stone.defaultMaxim;
+        if (!entry.reflection || !entry.reflection.trim()) {
+          delete state.claimed[stoneId];
+        }
+      }
+      state.showOriginalMaxim = false;
+      save();
+      render(false);
+    }
+
+    function goToVerse(ref) {
+      const vObj = VERSE_BY_ID[ref];
+      if (!vObj) return;
+      state.currentVerseRef = vObj.id;
+      state.currentStoneId = vObj.stoneId;
+      state.flipped = false;
+      state.focusedNoteKey = null;
+      state.showOriginalMaxim = false;
+      render(true);
+    }
+
+    function stepLinear(delta) {
+      const idx = VERSES.findIndex(v => v.id === state.currentVerseRef);
+      const next = VERSES[(idx + delta + VERSES.length) % VERSES.length];
+      goToVerse(next.id);
+    }
+
+    function flipStone(noteKey) {
+      if (noteKey) {
+        state.flipped = true;
+        state.focusedNoteKey = noteKey;
+      } else {
+        state.flipped = !state.flipped;
+        if (!state.flipped) state.focusedNoteKey = null;
+      }
+      render(false);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const night = document.body.getAttribute('data-theme') === 'night';
+      if (night) {
+        document.body.removeAttribute('data-theme');
+        document.getElementById('themeToggle').textContent = '☾';
+      } else {
+        document.body.setAttribute('data-theme', 'night');
+        document.getElementById('themeToggle').textContent = '☀';
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowLeft') stepLinear(-1);
+      if (e.key === 'ArrowRight') stepLinear(1);
+      if (e.key === 'f') flipStone(null);
+    });
+
+    render(true);
+  </script>
+</body>
+</html>
