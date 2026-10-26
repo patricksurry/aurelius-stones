@@ -353,6 +353,17 @@
       cursor: pointer;
     }
 
+    /* Historical people: a faint dotted line; click for the study side */
+    .verse .person {
+      border-bottom: 1px dotted color-mix(in srgb, var(--ink-faint) 70%, transparent);
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .verse .person:hover {
+      border-bottom-color: var(--ink);
+    }
+
     /* Ref inks in once the passage has been read */
     .verse-ref.read {
       color: var(--ink);
@@ -520,6 +531,24 @@
       color: var(--ink-mid);
       font-style: italic;
       margin-bottom: 0.75rem;
+    }
+
+    .person-entry {
+      border-radius: 6px;
+      transition: background 1.5s ease;
+    }
+
+    .person-entry.focused {
+      background: color-mix(in srgb, var(--stone-fill-claimed) 14%, transparent);
+    }
+
+    .person-entry a {
+      color: var(--ink);
+    }
+
+    .person-desc {
+      color: var(--ink-mid);
+      font-style: italic;
     }
 
     .study-sources {
@@ -758,6 +787,96 @@
       outline-offset: 2px;
     }
 
+    /* =====================================================
+       WELCOME: SHOWN ONCE, THEN FROM "ABOUT" ON THE MAP
+       ===================================================== */
+    .welcome {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+      transition: opacity 0.6s ease;
+    }
+
+    .welcome[hidden] {
+      display: none;
+    }
+
+    .welcome.leaving {
+      opacity: 0;
+    }
+
+    .welcome-inner {
+      max-width: 32rem;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: var(--ink-mid);
+    }
+
+    .welcome-inner p {
+      margin-bottom: 1rem;
+    }
+
+    .welcome-title {
+      font-size: 2.6rem;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .welcome-greek {
+      color: var(--ink-faint);
+      font-size: 1.05rem;
+      margin: 0.35rem 0 2rem !important;
+    }
+
+    .welcome-greek span {
+      font-style: italic;
+    }
+
+    .welcome-inner em {
+      color: var(--ink);
+    }
+
+    .welcome-begin {
+      margin: 1.25rem 0 2rem;
+      padding: 0.55rem 1.6rem;
+      background: none;
+      border: 1px solid var(--ink-faint);
+      border-radius: 999px;
+      font-family: var(--font);
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .welcome-begin:focus-visible {
+      outline: 1px solid var(--ink-faint);
+      outline-offset: 3px;
+    }
+
+    .welcome-begin:hover {
+      border-color: var(--ink);
+      background: color-mix(in srgb, var(--ink) 5%, transparent);
+    }
+
+    .welcome-keys,
+    .welcome-credit {
+      font-size: 0.9rem;
+      color: var(--ink-faint);
+    }
+
+    .welcome-keys b {
+      font-weight: 500;
+    }
+
     @media (max-width: 680px) {
       .stone {
         padding: 1.75rem 1.5rem 1.25rem;
@@ -793,13 +912,28 @@
 
   <div class="map" id="map" hidden></div>
 
+  <!-- First visit (and "about" on the map): what this is, in a breath -->
+  <div class="welcome" id="welcome" hidden>
+    <div class="welcome-inner">
+      <h1 class="welcome-title">Meditations</h1>
+      <p class="welcome-greek">Τὰ εἰς ἑαυτόν · <span>to himself</span></p>
+      <p>Marcus Aurelius, emperor of Rome, kept a notebook of reminders to himself. He never meant anyone else to read it.</p>
+      <p>Its 488 passages rest here on 48 <em>stones</em>: the thoughts he kept returning to, about how to see, what to accept, and how to act.</p>
+      <p>Read a passage slowly. Move through its stone. When something lands, put it in your own words, and the stone is yours.</p>
+      <button class="welcome-begin" id="welcomeBegin">Begin</button>
+      <p class="welcome-keys">↑ ↓ passages on a stone · ← → through the book · <b>f</b> study · <b>m</b> map</p>
+      <p class="welcome-credit">A. S. L. Farquharson's translation (1944), with his commentary, George Long's translation and the Greek on the study side.</p>
+    </div>
+  </div>
+
   <!-- FULL 12-BOOK, 488-VERSE, 48-STONE DATASET -->
-  <script src="data/meditations.js"></script>
+  <script src="data/meditations.js?v=ffb4e1ce2d"></script>
   <script>
     const DATA = window.MEDITATIONS_DATA;
     const BOOKS = DATA.books;
     const STONES = DATA.stones;
     const VERSES = DATA.verses;
+    const PEOPLE = DATA.people;
 
     const STONE_BY_ID = Object.fromEntries(STONES.map(s => [s.id, s]));
     const VERSE_BY_ID = Object.fromEntries(VERSES.map(v => [v.id, v]));
@@ -809,17 +943,6 @@
     const READ_MIN_MS = 10000;
     const IDLE_MS = 2500;
 
-    // Seed two starter claimed stones so the user immediately sees the unfilled vs. filled stone dynamic
-    const SEED_CLAIMED = {
-      'necessary': {
-        maxim: 'Before saying yes to anything today, ask: "Is this actually necessary?"',
-        reflection: 'Eliminate unnecessary thoughts first, so unnecessary actions don’t follow.'
-      },
-      'things-outside-door': {
-        maxim: 'I am allowed to hold zero opinion on 90% of the noise I encounter today.',
-        reflection: ''
-      }
-    };
 
     function load(key, fallback) {
       try {
@@ -843,7 +966,7 @@
       currentStoneId: VERSE_BY_ID[startRef].stoneId,
       flipped: false,
       mapOpen: false,
-      claimed: load('meditations_full_v1', SEED_CLAIMED),
+      claimed: load('meditations_full_v1', {}),
       read: new Set(load('meditations_read_v1', [])),
       // Unfinished "in your own words" summaries, per stone
       drafts: load('meditations_drafts_v1', {})
@@ -973,6 +1096,11 @@
           </div>
         `;
 
+        surface.querySelectorAll('.verse .person').forEach(el => {
+          const p = PEOPLE[el.dataset.person];
+          el.title = p.description ? `${p.name} · ${p.description}` : p.name;
+        });
+
         surface.querySelectorAll('.neighbor[data-ref], .pager-dot').forEach(el => {
           el.addEventListener('click', () => goToVerse(el.getAttribute('data-ref')));
         });
@@ -1060,6 +1188,17 @@
             </section>
           ` : ''}
 
+          ${activeV.people.length ? `
+            <section class="study-section" id="studyPeople">
+              <h2 class="study-head">People in this passage</h2>
+              ${activeV.people.map(id => `
+                <p class="person-entry" data-person="${id}">
+                  <a href="${PEOPLE[id].url}" target="_blank" rel="noopener">${escapeHtml(PEOPLE[id].name)}</a>${PEOPLE[id].description ? ` · <span class="person-desc">${escapeHtml(PEOPLE[id].description)}</span>` : ''}
+                </p>
+              `).join('')}
+            </section>
+          ` : ''}
+
           <section class="study-section">
             <h2 class="study-head">George Long's translation, 1862</h2>
             <p>${escapeHtml(activeV.long)}</p>
@@ -1085,6 +1224,7 @@
             George Long (1862), via <a href="https://www.gutenberg.org/ebooks/15877" target="_blank" rel="noopener">Project Gutenberg</a>.
             Greek: J. H. Leopold (Teubner, 1908), via the
             <a href="https://github.com/PerseusDL/canonical-greekLit/tree/master/data/tlg0562/tlg001" target="_blank" rel="noopener">Perseus Digital Library</a> (CC BY-SA 4.0).
+            People: <a href="https://en.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a>.
           </p>
 
           <div class="card-foot lens chrome">
@@ -1135,7 +1275,10 @@
         <div class="map-inner">
           <div class="map-head">
             <span>${state.read.size} of ${VERSES.length} passages read · ${claimedCount} of ${STONES.length} stones claimed</span>
-            <button class="quiet-btn" id="mapClose" title="Close (Esc)">close</button>
+            <span>
+              <button class="quiet-btn" id="mapAbout">about</button>
+              <button class="quiet-btn" id="mapClose" title="Close (Esc)">close</button>
+            </span>
           </div>
 
           ${BOOKS.map(b => `
@@ -1163,6 +1306,7 @@
       `;
 
       document.getElementById('mapClose').addEventListener('click', toggleMap);
+      document.getElementById('mapAbout').addEventListener('click', () => { toggleMap(); showWelcome(); });
 
       // Pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages
       const hover = document.getElementById('mapHover');
@@ -1273,10 +1417,16 @@
       if (target) goToVerse(target);
     }
 
-    function flipStone() {
+    function flipStone(personId) {
       state.flipped = !state.flipped;
       render();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const entry = personId && document.querySelector(`.person-entry[data-person="${personId}"]`);
+      if (entry) {
+        entry.classList.add('focused');
+        entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     function escapeHtml(str) {
@@ -1319,7 +1469,7 @@
         return;
       }
       if (state.read.has(dwell.ref)) return;
-      if (document.hidden || !document.hasFocus() || state.flipped || state.mapOpen) return;
+      if (document.hidden || !document.hasFocus() || state.flipped || state.mapOpen || !document.getElementById('welcome').hidden) return;
       dwell.ms += dt;
       if (dwell.ms >= readThresholdMs(VERSE_BY_ID[dwell.ref])) markRead(dwell.ref);
     }, 500);
@@ -1382,6 +1532,8 @@
     document.getElementById('progressBtn').addEventListener('click', toggleMap);
     document.getElementById('stoneSurface').addEventListener('click', (e) => {
       if (e.target.id === 'activeRef') toggleMap();
+      const person = e.target.closest('.verse .person');
+      if (person) flipStone(person.dataset.person);
     });
 
     window.addEventListener('keydown', (e) => {
@@ -1392,6 +1544,10 @@
         return;
       }
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!document.getElementById('welcome').hidden) {
+        if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); hideWelcome(); }
+        return;
+      }
       if (e.key === 'Escape') {
         if (state.mapOpen) toggleMap();
         else if (state.flipped) flipStone();
@@ -1408,10 +1564,28 @@
       if (e.key === 'm') toggleMap();
     });
 
+    // Welcome: once on first visit; Begin (or Enter / Esc) leads into the reading
+    function showWelcome() {
+      const el = document.getElementById('welcome');
+      el.classList.remove('leaving');
+      el.hidden = false;
+    }
+
+    function hideWelcome() {
+      const el = document.getElementById('welcome');
+      if (el.hidden) return;
+      store('meditations_welcomed_v1', true);
+      el.classList.add('leaving');
+      setTimeout(() => { el.hidden = true; }, 600);
+    }
+
+    document.getElementById('welcomeBegin').addEventListener('click', hideWelcome);
+
     applyTheme();
     document.body.classList.toggle('show-greek', prefs.greek);
     render();
     wake();
+    if (!load('meditations_welcomed_v1', false)) showWelcome();
   </script>
 </body>
 </html>

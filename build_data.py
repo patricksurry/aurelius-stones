@@ -6,6 +6,7 @@ from clustering/, and for each passage George Long's translation and
 Farquharson's commentary. Sources are listed in raw/SOURCES.md.
 """
 
+import hashlib
 import html
 import json
 import re
@@ -27,6 +28,7 @@ BOOK_HEADINGS = {
 # Stones (thematic groupings) and their relatedness come from clustering/;
 # see clustering/PROCESS.md for how they were made.
 CLUSTERING_DIR = "/Users/psurry/meditations/clustering"
+RAW_DIR = "/Users/psurry/meditations/raw"
 
 
 def load_aligned_verses():
@@ -141,6 +143,36 @@ def attach_sources(verses):
     return {b: c["intro"] for b, c in commentary.items()}
 
 
+def link_people(verses):
+    """Mark historical people in each passage and list them (people/people.json, raw/wikipedia/people.json)."""
+    with open("/Users/psurry/meditations/people/people.json", encoding="utf-8") as f:
+        spec = json.load(f)["people"]
+    with open(f"{RAW_DIR}/wikipedia/people.json", encoding="utf-8") as f:
+        wiki = json.load(f)["people"]
+
+    # Longest names first, so "Alexander the Great" wins over "Alexander"
+    forms = sorted(((form, p) for p in spec for form in p["forms"]), key=lambda fp: -len(fp[0]))
+    for v in verses:
+        text, taken, found = v["english"], [], []
+        for form, p in forms:
+            if ("only" in p and v["id"] not in p["only"]) or v["id"] in p.get("except", []):
+                continue
+            for m in re.finditer(rf"\b{re.escape(form)}\b", text):
+                if any(m.start() < b and a < m.end() for a, b in taken):
+                    continue
+                taken.append((m.start(), m.end()))
+                found.append((m.start(), m.end(), p["id"]))
+        for start, end, pid in sorted(found, reverse=True):
+            text = f'{text[:start]}<span class="person" data-person="{pid}">{text[start:end]}</span>{text[end:]}'
+        v["english"] = text
+        v["people"] = list(dict.fromkeys(pid for _, _, pid in sorted(found)))
+
+    return {
+        p["id"]: {"name": wiki[p["id"]]["title"], "url": wiki[p["id"]]["url"], "description": wiki[p["id"]]["description"]}
+        for p in spec if p["id"] in wiki
+    }
+
+
 def load_affinities():
     try:
         with open(f"{CLUSTERING_DIR}/affinity.json", encoding="utf-8") as f:
@@ -154,6 +186,7 @@ def main():
     verses = load_aligned_verses()
     stones = load_stones(verses)
     book_intros = attach_sources(verses)
+    people = link_people(verses)
     affinities = load_affinities()
 
     books_out = []
@@ -193,6 +226,7 @@ def main():
         },
         "books": books_out,
         "stones": stones_out,
+        "people": people,
         "verses": verses
     }
 
@@ -203,6 +237,15 @@ def main():
         f.write("window.MEDITATIONS_DATA = ")
         json.dump(dataset, f, ensure_ascii=False)
         f.write(";\n")
+
+    # Version the data file's URL by its content, so browsers never pair new code with a stale cached copy
+    with open("/Users/psurry/meditations/data/meditations.js", "rb") as f:
+        version = hashlib.sha1(f.read()).hexdigest()[:10]
+    with open("/Users/psurry/meditations/index.html", encoding="utf-8") as f:
+        page = f.read()
+    page = re.sub(r'src="data/meditations\.js(\?v=[0-9a-f]+)?"', f'src="data/meditations.js?v={version}"', page)
+    with open("/Users/psurry/meditations/index.html", "w", encoding="utf-8") as f:
+        f.write(page)
 
     print(f"Built dataset: {len(books_out)} books, {len(verses)} verses, {len(stones_out)} stones.")
     for s in stones_out[:10]:

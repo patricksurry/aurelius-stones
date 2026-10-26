@@ -47,6 +47,13 @@ Every text in the app comes from one of the sources below. A copy of each is arc
 - **Archived as:** `gutenberg/long_pg15877.txt`.
 - **Use:** Long numbers sections after Gataker, which matches Leopold everywhere except that Leopold splits Long's V.36 into V.36–37; `sources.py` makes that split. Long's footnotes and his index of Greek terms are left out, though they could be a source for future term notes.
 
+## People: English Wikipedia
+
+- **Source:** English Wikipedia's page summary API (`/api/rest_v1/page/summary/{title}`), for the 67 people listed in `people/people.json`.
+- **Licence:** Wikipedia text is CC BY-SA 4.0. The app shows only each article's one-line description, plus a link.
+- **Archived as:** `wikipedia/people.json`. For each person it holds the article title, URL, short description, opening extract and revision ID, retrieved 2026-10-26.
+- **How identities were chosen:** see `people/README.md`.
+
 ## Not used
 
 - **Translation notes from the earlier mock-up:** removed. 18 of the 24 hand-written notes quoted phrases that aren't in Farquharson but credited them to him, and their comparisons with modern translations (Hammond, Hays, Long) couldn't be checked.
