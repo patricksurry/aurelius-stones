@@ -1,0 +1,549 @@
+{
+  "retrieved": "2026-10-26",
+  "people": {
+    "verus-grandfather": {
+      "title": "Marcus Annius Verus (grandfather of Marcus Aurelius)",
+      "url": "https://en.wikipedia.org/wiki/Marcus_Annius_Verus_(grandfather_of_Marcus_Aurelius)",
+      "description": "Roman senator, grandfather of emperor Marcus Aurelius",
+      "extract": "Marcus Annius Verus was the paternal grandfather and adoptive father of the Roman Emperor Marcus Aurelius, and father-in-law of the emperor Antoninus Pius.",
+      "revision": "1347229470",
+      "requested": "Marcus Annius Verus (grandfather of Marcus Aurelius)"
+    },
+    "verus-father": {
+      "title": "Marcus Annius Verus (father of Marcus Aurelius)",
+      "url": "https://en.wikipedia.org/wiki/Marcus_Annius_Verus_(father_of_Marcus_Aurelius)",
+      "description": "2nd-century Roman politician",
+      "extract": "Marcus Annius Verus was a distinguished Roman politician who lived in the 2nd century, served as a praetor and was the father of the Emperor Marcus Aurelius.",
+      "revision": "1362832302",
+      "requested": "Marcus Annius Verus (praetor)"
+    },
+    "lucius-verus": {
+      "title": "Lucius Verus",
+      "url": "https://en.wikipedia.org/wiki/Lucius_Verus",
+      "description": "Roman emperor from 161 to 169",
+      "extract": "Lucius Aurelius Verus was Roman emperor from 161 until his death in 169, alongside his adoptive brother Marcus Aurelius. He was a member of the Nerva–Antonine dynasty. Verus' succession together with Marcus Aurelius marked the first time that the Roman Empire was ruled by more than one emperor simultaneously, an increasingly common occurrence in the later history of the Empire.",
+      "revision": "1358592352",
+      "requested": "Lucius Verus"
+    },
+    "domitia-lucilla": {
+      "title": "Domitia Lucilla (mother of Marcus Aurelius)",
+      "url": "https://en.wikipedia.org/wiki/Domitia_Lucilla_(mother_of_Marcus_Aurelius)",
+      "description": "Mother of Roman emperor Marcus Aurelius",
+      "extract": "Calvisia Domitia Lucilla, was a noble Roman woman who lived in the 2nd century. She is best known as the mother of the Roman Emperor Marcus Aurelius.",
+      "revision": "1354009736",
+      "requested": "Domitia Lucilla"
+    },
+    "rusticus": {
+      "title": "Junius Rusticus",
+      "url": "https://en.wikipedia.org/wiki/Junius_Rusticus",
+      "description": "2nd century Roman teacher, politician and Stoic philosopher",
+      "extract": "Quintus Junius Rusticus, was a Roman teacher and politician. He was probably a grandson of Arulenus Rusticus, who was a prominent member of the Stoic Opposition. He was a Stoic philosopher and was one of the teachers of the emperor Marcus Aurelius, whom Aurelius treated with the utmost respect and honour.",
+      "revision": "1372030307",
+      "requested": "Quintus Junius Rusticus"
+    },
+    "apollonius": {
+      "title": "Apollonius of Chalcedon",
+      "url": "https://en.wikipedia.org/wiki/Apollonius_of_Chalcedon",
+      "description": "Tutor to sons of Roman emperor Antoninus Pius",
+      "extract": "Apollonius of Chalcedon was an ancient Greek Stoic who taught philosophy. He was invited by the Roman emperor Antoninus Pius to come to Rome, for the purpose of instructing his adoptive sons Marcus Aurelius and Lucius Verus in philosophy. Aurelius, within his Meditations, writes of Apollonius favourably. Lucian writes of him:When Apollonius was appointed professor of philosophy in the Imperial household, Demonax witnessed his departure, attended by a great number of his pupils. 'Why, here is Apollonius with all his Argonauts,' he cried.",
+      "revision": "1293185096",
+      "requested": "Apollonius of Chalcedon"
+    },
+    "sextus": {
+      "title": "Sextus of Chaeronea",
+      "url": "https://en.wikipedia.org/wiki/Sextus_of_Chaeronea",
+      "description": "Greek philosopher and teacher (c. 95 - c. 185)",
+      "extract": "Sextus of Chaeronea was a philosopher, a nephew or grandson of Plutarch, and one of the teachers of the emperor Marcus Aurelius.",
+      "revision": "1376000921",
+      "requested": "Sextus of Chaeronea"
+    },
+    "alexander-grammarian": {
+      "title": "Alexander of Cotiaeum",
+      "url": "https://en.wikipedia.org/wiki/Alexander_of_Cotiaeum",
+      "description": "2nd-century Greek grammarian",
+      "extract": "Alexander of Cotyaeum was a Greek grammarian, who is mentioned among the instructors of the Roman emperor Marcus Aurelius. We still possess an epitaph pronounced upon him by the rhetorician Aelius Aristides, who had studied under Alexander.",
+      "revision": "1351298736",
+      "requested": "Alexander of Cotiaeum"
+    },
+    "alexander-platonist": {
+      "title": "Alexander Peloplaton",
+      "url": "https://en.wikipedia.org/wiki/Alexander_Peloplaton",
+      "description": "2nd century Greek rhetorician and Platonist philosopher",
+      "extract": "Alexander, nicknamed Pēloplátōn, also known as Alexander of Seleucia and Alexander the Platonic, was a Greek rhetorician and Platonist philosopher of the age of the Antonines and the Second Sophistic.",
+      "revision": "1354182110",
+      "requested": "Alexander of Seleucia"
+    },
+    "fronto": {
+      "title": "Marcus Cornelius Fronto",
+      "url": "https://en.wikipedia.org/wiki/Marcus_Cornelius_Fronto",
+      "description": "2nd century AD Roman rhetorician and advocate",
+      "extract": "Marcus Cornelius Fronto, best known as Fronto, was a Roman grammarian, rhetorician, and advocate. Of Berber origin, he was born at Cirta in Numidia. He was suffect consul for the nundinium of July–August 142 with Gaius Laberius Priscus as his colleague. Emperor Antoninus Pius appointed him tutor to his adopted sons, the future emperors Marcus Aurelius and Lucius Verus.",
+      "revision": "1362338765",
+      "requested": "Marcus Cornelius Fronto"
+    },
+    "domitius-afer": {
+      "title": "Gnaeus Domitius Afer",
+      "url": "https://en.wikipedia.org/wiki/Gnaeus_Domitius_Afer",
+      "description": "1st century AD Roman orator and advocate",
+      "extract": "Gnaeus Domitius Afer was a Roman orator and advocate, born at Nemausus (Nîmes) in Gallia Narbonensis. He flourished in the reigns of Tiberius, Caligula, Claudius and Nero. He was suffect consul in the nundinium of September to December 39 as the colleague of Aulus Didius Gallus.",
+      "revision": "1307592556",
+      "requested": "Gnaeus Domitius Afer"
+    },
+    "severus": {
+      "title": "Gnaeus Claudius Severus Arabianus",
+      "url": "https://en.wikipedia.org/wiki/Gnaeus_Claudius_Severus_Arabianus",
+      "description": "2nd century Roman senator and philosopher",
+      "extract": "Gnaeus Claudius Severus Arabianus was a senator and philosopher who lived in the Roman Empire.",
+      "revision": "1230285111",
+      "requested": "Gnaeus Claudius Severus Arabianus"
+    },
+    "thrasea": {
+      "title": "Publius Clodius Thrasea Paetus",
+      "url": "https://en.wikipedia.org/wiki/Publius_Clodius_Thrasea_Paetus",
+      "description": "1st century AD Roman senator",
+      "extract": "Publius Clodius Thrasea Paetus was a Roman senator who lived in the 1st century AD. Notable for his principled opposition to the emperor Nero and his interest in Stoicism, he was the husband of Arria, who was the daughter of Aulus Caecina Paetus and the elder Arria, father-in-law of Helvidius Priscus, and a friend and relative by marriage of the poet Persius. Thrasea was the most prominent member of the political faction known today as the Stoic Opposition.",
+      "revision": "1368364275",
+      "requested": "Publius Clodius Thrasea Paetus"
+    },
+    "helvidius": {
+      "title": "Helvidius Priscus",
+      "url": "https://en.wikipedia.org/wiki/Helvidius_Priscus",
+      "description": "1st century AD Roman philosopher and statesman",
+      "extract": "Helvidius Priscus, Stoic philosopher and statesman, lived during the reigns of Nero, Galba, Otho, Vitellius and Vespasian.",
+      "revision": "1350956036",
+      "requested": "Helvidius Priscus"
+    },
+    "cato-younger": {
+      "title": "Cato the Younger",
+      "url": "https://en.wikipedia.org/wiki/Cato_the_Younger",
+      "description": "Roman politician and Stoic (95–46 BC)",
+      "extract": "Marcus Porcius Cato Uticensis, also known as Cato the Younger, was an influential conservative Roman senator during the late Republic. A staunch advocate for liberty and the preservation of the Republic's principles, he dedicated himself to protecting the traditional Roman values he believed were in decline. A noted orator and a follower of Stoicism, his scrupulous honesty and professed respect for tradition gave him a political following which he mobilised against powerful generals of his day, including Julius Caesar and Pompey.",
+      "revision": "1381862304",
+      "requested": "Cato the Younger"
+    },
+    "cato-elder": {
+      "title": "Cato the Elder",
+      "url": "https://en.wikipedia.org/wiki/Cato_the_Elder",
+      "description": "Roman politician, soldier and writer (234–149 BC)",
+      "extract": " Marcus Porcius Cato, also known as Cato the Censor, the Elder and the Wise, was a Roman soldier, senator, and historian known for his conservatism and opposition to Hellenization. He was the first to write history in Latin with his Origines, a now fragmentary work on the history of Rome. His work De agri cultura, a treatise on agriculture, rituals, and recipes, is the oldest extant prose written in the Latin language. Cato's epithet \"Elder\" distinguishes him from his great-grandson Cato the Younger.",
+      "revision": "1380672009",
+      "requested": "Cato the Elder"
+    },
+    "dion": {
+      "title": "Dion of Syracuse",
+      "url": "https://en.wikipedia.org/wiki/Dion_of_Syracuse",
+      "description": "4th-century BC Tyrant of Syracuse",
+      "extract": "Dion, tyrant of Syracuse in Magna Graecia, was the son of Hipparinus, and brother-in-law of Dionysius I of Syracuse. A disciple of Plato, he became Dionysius I's most trusted minister and adviser. However, his great wealth, his belief in Platonism and his ambition aroused the suspicions of Dionysius I's son and successor, Dionysius II. An indiscreet letter from Dion to the Carthaginians led to his banishment. Settling in Athens, he lived a prosperous life until Dionysius II dispossessed him of his estates and income. Landing in Sicily in 357 BC, he was successful in conquering Syracuse. However, Dion soon quarrelled with the radical leader Heraclides and was forced into exile. Recalled in 355 BC, he became master of the whole city but alienated the population with his imperious behaviour and financial demands. His supporters abandoned him, and he was assassinated. Dion's attempts to liberate Sicily only brought the island political and social chaos which lasted for nearly 20 years.",
+      "revision": "1369147260",
+      "requested": "Dion of Syracuse"
+    },
+    "brutus": {
+      "title": "Marcus Junius Brutus",
+      "url": "https://en.wikipedia.org/wiki/Marcus_Junius_Brutus",
+      "description": "Roman politician and assassin of Julius Caesar (85–42 BC)",
+      "extract": "Marcus Junius Brutus was a Roman politician, orator, and the most famous of the assassins of Julius Caesar. After being adopted by a relative, his legal name became Quintus Servilius Caepio Brutus. He is often referred to simply as Brutus.",
+      "revision": "1381518508",
+      "requested": "Marcus Junius Brutus"
+    },
+    "claudius-maximus": {
+      "title": "Claudius Maximus",
+      "url": "https://en.wikipedia.org/wiki/Claudius_Maximus",
+      "description": "2nd century Roman politician and philosopher",
+      "extract": "Gaius Claudius Maximus was a Roman politician, a Stoic philosopher and a teacher of Marcus Aurelius. No works by him are known to exist; however, he is mentioned in a few prestigious works from classical literature.",
+      "revision": "1297277399",
+      "requested": "Claudius Maximus"
+    },
+    "antoninus-pius": {
+      "title": "Antoninus Pius",
+      "url": "https://en.wikipedia.org/wiki/Antoninus_Pius",
+      "description": "Roman emperor from 138 to 161",
+      "extract": "Titus Aelius Hadrianus Antoninus Pius was Roman emperor from AD 138 to 161. He was the fourth of the Five Good Emperors from the Nerva–Antonine dynasty and also the fourth of the six adoptive emperors.",
+      "revision": "1381350836",
+      "requested": "Antoninus Pius"
+    },
+    "faustina-elder": {
+      "title": "Faustina the Elder",
+      "url": "https://en.wikipedia.org/wiki/Faustina_the_Elder",
+      "description": "Roman empress from 138 to 140",
+      "extract": "Annia Galeria Faustina the Elder, sometimes referred to as Faustina I or Faustina Major, was a Roman empress and wife of the Roman emperor Antoninus Pius. The emperor Marcus Aurelius was her nephew and later became her adopted son, along with Emperor Lucius Verus. She died early in the principate of Antoninus Pius, but continued to be prominently commemorated as a diva, posthumously playing a prominent symbolic role during his reign.",
+      "revision": "1367050183",
+      "requested": "Faustina the Elder"
+    },
+    "hadrian": {
+      "title": "Hadrian",
+      "url": "https://en.wikipedia.org/wiki/Hadrian",
+      "description": "Roman emperor from 117 to 138",
+      "extract": "Hadrian was the Roman emperor from 117 to 138. His form of address as Roman emperor was Imperator Caesar Traianus Hadrianus Augustus. Hadrian was born in Italica, in the present-day Andalusian province of Seville in southern Spain, an Italic settlement in Hispania Baetica; his gens Aelia came from the town of Hadria in central Italy. He was a member of the Nerva–Antonine dynasty.",
+      "revision": "1381655037",
+      "requested": "Hadrian"
+    },
+    "augustus": {
+      "title": "Augustus",
+      "url": "https://en.wikipedia.org/wiki/Augustus",
+      "description": "Roman emperor from 27 BC to AD 14",
+      "extract": "Augustus, also known as Octavian, was the founder of the Roman Empire and the first Roman emperor from 27 BC until his death in AD 14. The reign of Augustus initiated an imperial cult and an era of imperial peace when the Roman world was largely free of armed conflict. The principate, a style of government in which the emperor showed nominal deference to the Senate, was established during his reign and lasted until the Crisis of the Third Century.",
+      "revision": "1382007962",
+      "requested": "Augustus"
+    },
+    "tiberius": {
+      "title": "Tiberius",
+      "url": "https://en.wikipedia.org/wiki/Tiberius",
+      "description": "Roman emperor from AD 14 to 37",
+      "extract": "Tiberius Julius Caesar Augustus was the second Roman emperor from AD 14 until his death, reigning as the second ruler of the Julio-Claudian dynasty. He succeeded his stepfather Augustus, the first Roman emperor. Tiberius was born in Rome in 42 BC to politician Tiberius Claudius Nero and his wife, Livia Drusilla. In 38 BC, Livia divorced Nero and married Augustus. Following the untimely deaths of Augustus's two grandsons and adopted heirs, Gaius and Lucius Caesar, Tiberius was designated Augustus's successor. Prior to this, Tiberius had proved himself an able diplomat and one of the most successful Roman generals. His conquests of Pannonia, Dalmatia, Raetia, and (temporarily) parts of Germania laid the foundations for the empire's northern frontier.",
+      "revision": "1381468253",
+      "requested": "Tiberius"
+    },
+    "vespasian": {
+      "title": "Vespasian",
+      "url": "https://en.wikipedia.org/wiki/Vespasian",
+      "description": "Roman emperor from AD 69 to 79",
+      "extract": "Vespasian was Roman emperor from 69 to 79. The last emperor to reign in the Year of the Four Emperors, he founded the Flavian dynasty, which ruled the empire for 27 years. His fiscal reforms and consolidation of the empire brought political stability and an extensive building program.",
+      "revision": "1381471790",
+      "requested": "Vespasian"
+    },
+    "trajan": {
+      "title": "Trajan",
+      "url": "https://en.wikipedia.org/wiki/Trajan",
+      "description": "Roman emperor from AD 98 to 117",
+      "extract": "Trajan was the Roman emperor from 98 to 117, remembered as the second of the Five Good Emperors of the Nerva–Antonine dynasty. He was a philanthropic ruler and a successful soldier-emperor who presided over one of the greatest military expansions in Roman history, during which, by the time of his death, the Roman Empire reached its maximum territorial extent. He was given the title of optimus princeps by the Roman Senate.",
+      "revision": "1381764951",
+      "requested": "Trajan"
+    },
+    "nero": {
+      "title": "Nero",
+      "url": "https://en.wikipedia.org/wiki/Nero",
+      "description": "Roman emperor from AD 54 to 68",
+      "extract": "Nero Claudius Caesar Augustus Germanicus was Roman emperor from AD 54 until his suicide in AD 68. He was the final emperor of the Julio-Claudian dynasty, which comprised the first five emperors.",
+      "revision": "1380077952",
+      "requested": "Nero"
+    },
+    "agrippa": {
+      "title": "Marcus Vipsanius Agrippa",
+      "url": "https://en.wikipedia.org/wiki/Marcus_Vipsanius_Agrippa",
+      "description": "Roman general and statesman (c. 63–12 BC)",
+      "extract": "Marcus Vipsanius Agrippa was a Roman general and statesman who was a close friend, son-in-law and lieutenant to the Roman emperor Augustus. Agrippa is well known for his important military victories, notably the Battle of Actium in 31 BC against the forces of Marcus Antonius and Cleopatra. He was also responsible for the construction of some of the most notable buildings of his era, including the original Pantheon.",
+      "revision": "1378370443",
+      "requested": "Marcus Vipsanius Agrippa"
+    },
+    "maecenas": {
+      "title": "Gaius Maecenas",
+      "url": "https://en.wikipedia.org/wiki/Gaius_Maecenas",
+      "description": "Roman political advisor (d. 8 BCE)",
+      "extract": "Gaius Cilnius Maecenas was a friend and political advisor to Octavian. He was also an important patron for the new generation of Augustan poets, including both Horace and Virgil. In many languages, his name is an eponym for \"patron of arts\".",
+      "revision": "1379872305",
+      "requested": "Gaius Maecenas"
+    },
+    "areios": {
+      "title": "Arius Didymus",
+      "url": "https://en.wikipedia.org/wiki/Arius_Didymus",
+      "description": "1st century BCE Greek Stoic philosopher",
+      "extract": "Arius Didymus was a Stoic philosopher and teacher of Augustus. Fragments of his handbooks summarizing Stoic and Peripatetic doctrines are preserved by Stobaeus and by Eusebius of Caesarea.",
+      "revision": "1356335875",
+      "requested": "Arius Didymus"
+    },
+    "julius-caesar": {
+      "title": "Julius Caesar",
+      "url": "https://en.wikipedia.org/wiki/Julius_Caesar",
+      "description": "Roman general and dictator (100–44 BC)",
+      "extract": "Gaius Julius Caesar was a Roman general, statesman, and author who was the dictator of the Roman Republic almost continuously from 49 BC until his assassination in 44 BC. A member of the First Triumvirate, he led the Roman armies through the Gallic Wars and defeated his political rival Pompey in Caesar's civil war. He consolidated power and was titled as dictator perpetuo in 44 BC, helping create the political conditions that led to the collapse of the Roman Republic and the emergence of the Roman Empire. For his role in these events, he is regarded as one of history's most influential figures.",
+      "revision": "1378696395",
+      "requested": "Julius Caesar"
+    },
+    "pompey": {
+      "title": "Pompey",
+      "url": "https://en.wikipedia.org/wiki/Pompey",
+      "description": "Roman general and statesman (106–48 BC)",
+      "extract": "Gnaeus Pompeius Magnus, known in English as Pompey or Pompey the Great, was a Roman general and statesman who was prominent in the final decades of the Roman Republic. As a young man, he was a partisan and protégé of the dictator Sulla, after whose death he achieved significant military and political success.",
+      "revision": "1381070208",
+      "requested": "Pompey"
+    },
+    "alexander-great": {
+      "title": "Alexander the Great",
+      "url": "https://en.wikipedia.org/wiki/Alexander_the_Great",
+      "description": "King of Macedon from 336 to 323 BC",
+      "extract": "Alexander III of Macedon, most commonly known as Alexander the Great, was king of the ancient Greek kingdom of Macedon from 336 BC until his death. He was the son of Philip II, born to him by his fourth wife, Olympias, and ascended to the throne at the age of 20 after Philip was assassinated. Alexander spent most of his reign conducting a lengthy military campaign throughout Asia and Egypt, and by the age of 30, he had created one of the largest empires in history, stretching from Greece to northwestern India. He was undefeated in battle and is widely considered to be one of history's greatest and most successful military commanders.",
+      "revision": "1381253274",
+      "requested": "Alexander the Great"
+    },
+    "philip-ii": {
+      "title": "Philip II of Macedon",
+      "url": "https://en.wikipedia.org/wiki/Philip_II_of_Macedon",
+      "description": "King of Macedon from 359 to 336 BC",
+      "extract": "Philip II of Macedon was the king (basileus) of Macedon from 359 BC until his death in 336 BC. \nThe rise of Macedon, from a kingdom initially at the periphery of classical Greek affairs, to a power that came to dominate Ancient Greece in the span of less than 25 years, was largely thanks to the character and policies of Philip. He was the father of Alexander the Great and a member of the ruling Argead dynasty that founded the kingdom of the Macedonians.",
+      "revision": "1381882393",
+      "requested": "Philip II of Macedon"
+    },
+    "perdiccas-ii": {
+      "title": "Perdiccas II of Macedon",
+      "url": "https://en.wikipedia.org/wiki/Perdiccas_II_of_Macedon",
+      "description": "5th-century BC king of Macedon",
+      "extract": "Perdiccas II was the king of Argead Macedon from 454 BC until his death in 413 BC. During the Peloponnesian War, he frequently switched sides between Sparta and Athens.",
+      "revision": "1360717059",
+      "requested": "Perdiccas II of Macedon"
+    },
+    "croesus": {
+      "title": "Croesus",
+      "url": "https://en.wikipedia.org/wiki/Croesus",
+      "description": "King of Lydia from 585 or 561 to 547 BC",
+      "extract": "Croesus was the last king of Lydia from 585 BC to 546 BC. He was renowned for his great wealth, as well as his ultimate defeat by the Persian king Cyrus the Great following the siege of Sardis.",
+      "revision": "1381764189",
+      "requested": "Croesus"
+    },
+    "phalaris": {
+      "title": "Phalaris",
+      "url": "https://en.wikipedia.org/wiki/Phalaris",
+      "description": "Sicilian despot, 570 to 554 BC",
+      "extract": "Phalaris was the tyrant of Akragas in Sicily in Magna Graecia, from approximately 570 to 554 BC.",
+      "revision": "1381218374",
+      "requested": "Phalaris"
+    },
+    "demetrius-phalerum": {
+      "title": "Demetrius of Phalerum",
+      "url": "https://en.wikipedia.org/wiki/Demetrius_of_Phalerum",
+      "description": "Greek statesman and philosopher (c.350–c.280 BC)",
+      "extract": "Demetrius of Phalerum was an Athenian orator originally from Phalerum, an ancient port of Athens. A student of Theophrastus, and perhaps of Aristotle, he was one of the first members of the Peripatetic school of philosophy. Demetrius had been a distinguished statesman who was appointed by Cassander, the King of Macedon, to govern Athens, where Demetrius ruled as sole ruler for ten years. During this time, he introduced important reforms of the legal system, while also maintaining pro-Cassander oligarchic rule.",
+      "revision": "1370889107",
+      "requested": "Demetrius of Phalerum"
+    },
+    "camillus": {
+      "title": "Marcus Furius Camillus",
+      "url": "https://en.wikipedia.org/wiki/Marcus_Furius_Camillus",
+      "description": "4th-century BC Roman dictator and general",
+      "extract": "Marcus Furius Camillus was a Roman statesman and politician during the early Roman republic who is most famous for his capture of Veii and defence of Rome from Gallic sack after the Battle of the Allia. Modern scholars are dubious of Camillus' supposed exploits and believe many of them are wrongly attributed or otherwise wholly fictitious.",
+      "revision": "1377892956",
+      "requested": "Marcus Furius Camillus"
+    },
+    "dentatus": {
+      "title": "Manius Curius Dentatus",
+      "url": "https://en.wikipedia.org/wiki/Manius_Curius_Dentatus",
+      "description": "3rd-century BC Roman general and statesman",
+      "extract": "Manius Curius Dentatus was a Roman general and statesman noted for ending the Samnite War and for his military exploits during the Pyrrhic War. According to Pliny, he was born with teeth, thus earning the surname Dentatus, \"toothed.\"",
+      "revision": "1363457848",
+      "requested": "Manius Curius Dentatus"
+    },
+    "scipio": {
+      "title": "Scipio Africanus",
+      "url": "https://en.wikipedia.org/wiki/Scipio_Africanus",
+      "description": "Roman general and politician (236/235 – c. 183 BC)",
+      "extract": "Publius Cornelius Scipio Africanus was a Roman general and statesman who was one of the main architects of Rome's victory against Carthage in the Second Punic War. Often regarded as one of the greatest military commanders and strategists of all time, his crowning achievement was the defeat of Hannibal at the Battle of Zama in 202 BC, which earned him the honorific epithet Africanus.",
+      "revision": "1381392664",
+      "requested": "Scipio Africanus"
+    },
+    "phocion": {
+      "title": "Phocion",
+      "url": "https://en.wikipedia.org/wiki/Phocion",
+      "description": "4th-century BCE Athenian statesman and general",
+      "extract": "Phocion, nicknamed The Good, was an Athenian statesman and strategos, and the subject of one of Plutarch's Parallel Lives.",
+      "revision": "1317033240",
+      "requested": "Phocion"
+    },
+    "socrates": {
+      "title": "Socrates",
+      "url": "https://en.wikipedia.org/wiki/Socrates",
+      "description": "Ancient Greek philosopher (c. 470–399 BC)",
+      "extract": "Socrates was an ancient Greek philosopher from Classical Athens, perhaps the first Western moral philosopher, and a major inspiration on his student Plato, who largely founded the tradition of Western philosophy. An enigmatic figure, Socrates authored no texts and is known mainly through the posthumous accounts of classical writers, particularly his students Plato and Xenophon. These accounts are written as dialogues, in which Socrates and his interlocutors examine a subject in the style of question and answer; they gave rise to the Socratic dialogue literary genre. Contradictory accounts of Socrates make a reconstruction of his philosophy nearly impossible, a situation known as the Socratic problem. Socrates was a polarizing figure in Athenian society. In 399 BC, he was accused of impiety and corrupting the youth. After a trial that lasted a day, he was sentenced to death. As related by Plato, he was put to death by administration of poison after refusing offers from allies to help him escape.",
+      "revision": "1381188957",
+      "requested": "Socrates"
+    },
+    "xanthippe": {
+      "title": "Xanthippe",
+      "url": "https://en.wikipedia.org/wiki/Xanthippe",
+      "description": "Ancient Athenian, wife of Socrates",
+      "extract": "Xanthippe was an ancient Athenian, the wife of Socrates and mother of their son Lamprocles; she may also have been the mother of his other sons Sophroniscus and Menexenus. She was likely much younger than Socrates, perhaps by around 30 years. In Xenophon's Symposium, she is described by Antisthenes as \"the most difficult, harshest, painful, ill-tempered\" wife; this characterisation of Xanthippe has influenced all subsequent portrayals of her.",
+      "revision": "1381054018",
+      "requested": "Xanthippe"
+    },
+    "xenophon": {
+      "title": "Xenophon",
+      "url": "https://en.wikipedia.org/wiki/Xenophon",
+      "description": "Greek philosopher, historian, and soldier (c.430–355/354 BC)",
+      "extract": "Xenophon of Athens was a Greek military leader, philosopher, economist, and historian. At the age of 30, he was elected as one of the leaders of the retreating Greek mercenaries, the Ten Thousand, who had been part of Cyrus the Younger's attempt to seize control of the Achaemenid Empire. As the military historian Theodore Ayrault Dodge wrote, \"the centuries since have devised nothing to surpass the genius of this warrior\".",
+      "revision": "1376270847",
+      "requested": "Xenophon"
+    },
+    "crito": {
+      "title": "Crito of Alopece",
+      "url": "https://en.wikipedia.org/wiki/Crito_of_Alopece",
+      "description": "5th-century BC Athenian philosopher",
+      "extract": "Crito of Alopece was an ancient Athenian agriculturist depicted in the Socratic literature of Plato and Xenophon, where he appears as a faithful and lifelong companion of the philosopher Socrates. Although the later tradition of ancient scholarship attributed philosophical works to Crito, modern scholars do not consider him to have been an active philosopher, but rather a member of Socrates' inner circle through childhood friendship.",
+      "revision": "1356479871",
+      "requested": "Crito of Alopece"
+    },
+    "leon-salamis": {
+      "title": "Leon of Salamis",
+      "url": "https://en.wikipedia.org/wiki/Leon_of_Salamis",
+      "description": "5th-century BC Athenian commander",
+      "extract": "Leon of Salamis was a historical figure, mentioned in Plato's Apology, Xenophon's Hellenica and Andocides' On the Mysteries (1.94). This Leon may also be the renowned Athenian general Leon of the Peloponnesian War.",
+      "revision": "1366193338",
+      "requested": "Leon of Salamis"
+    },
+    "plato": {
+      "title": "Plato",
+      "url": "https://en.wikipedia.org/wiki/Plato",
+      "description": "Ancient Greek philosopher (c. 428-347 BC)",
+      "extract": "Plato was an ancient Greek philosopher of Classical Athens who is most commonly considered the foundational thinker of the Western philosophical tradition. An innovator of the literary dialogue and dialectic forms, Plato influenced all the major areas of theoretical philosophy and practical philosophy, and was the founder of the Academy, a philosophical school in Athens where Plato taught the collection of philosophical theories that would later become known as Platonism.",
+      "revision": "1380641527",
+      "requested": "Plato"
+    },
+    "heraclitus": {
+      "title": "Heraclitus",
+      "url": "https://en.wikipedia.org/wiki/Heraclitus",
+      "description": "Ancient Greek philosopher (fl. c. 500 BC)",
+      "extract": "Heraclitus was a pre-Socratic Greek philosopher from the city of Ephesus, which was then part of the Persian Empire. He exerts a wide influence on Western philosophy, both ancient and modern, through the works of such authors as Plato, Aristotle, the Stoics, Georg Wilhelm Friedrich Hegel, Friedrich Nietzsche, and Martin Heidegger.",
+      "revision": "1380703290",
+      "requested": "Heraclitus"
+    },
+    "democritus": {
+      "title": "Democritus",
+      "url": "https://en.wikipedia.org/wiki/Democritus",
+      "description": "Greek philosopher (c. 460–c. 370 BC)",
+      "extract": "Democritus was a pre-Socratic Greek philosopher from Abdera, primarily remembered today for his formulation of an atomic theory of the universe. Democritus wrote extensively on a wide variety of topics.",
+      "revision": "1381070773",
+      "requested": "Democritus"
+    },
+    "pythagoras": {
+      "title": "Pythagoras",
+      "url": "https://en.wikipedia.org/wiki/Pythagoras",
+      "description": "Greek philosopher (c. 570 – c. 495 BC)",
+      "extract": "Pythagoras of Samos was an ancient Ionian Greek philosopher, polymath, and the eponymous founder of Pythagoreanism. His political and religious teachings were well known in Magna Graecia and influenced the philosophies of Plato, Aristotle, and, through them, Western philosophy. Modern scholars disagree regarding Pythagoras's education and influences, but most agree that he travelled to Croton in southern Italy around 530 BC, where he founded a school in which initiates were allegedly sworn to secrecy and lived a communal, ascetic lifestyle.",
+      "revision": "1379710816",
+      "requested": "Pythagoras"
+    },
+    "empedocles": {
+      "title": "Empedocles",
+      "url": "https://en.wikipedia.org/wiki/Empedocles",
+      "description": "5th century BC Greek philosopher",
+      "extract": "Empedocles was a pre-Socratic Greek philosopher and a native citizen of Akragas, a Greek city in Sicily. Empedocles' philosophy is known best for originating the cosmogonic theory of the four classical elements. He also proposed forces he called Love and Strife which would mix and separate the elements, respectively.",
+      "revision": "1380144911",
+      "requested": "Empedocles"
+    },
+    "theophrastus": {
+      "title": "Theophrastus",
+      "url": "https://en.wikipedia.org/wiki/Theophrastus",
+      "description": "Greek philosopher (c. 371 – c. 287 BC)",
+      "extract": "Theophrastus was an ancient Greek philosopher and naturalist. A native of Eresos in Lesbos, he was Aristotle's close colleague and successor as head of the Lyceum, the Peripatetic school of philosophy in Athens. Theophrastus wrote numerous treatises across all areas of philosophy, working to support, improve, expand, and develop the Aristotelian system. He made significant contributions to various fields, including ethics, metaphysics, botany, and natural history. Often considered the \"father of botany\" for his groundbreaking works \"Enquiry into Plants\" and \"On the Causes of Plants\",, Theophrastus established the foundations of botanical science. His given name was Tyrtamos ; the nickname Theophrastus was reputedly given to him by Aristotle in recognition of his eloquent style.",
+      "revision": "1379932454",
+      "requested": "Theophrastus"
+    },
+    "diogenes": {
+      "title": "Diogenes",
+      "url": "https://en.wikipedia.org/wiki/Diogenes",
+      "description": "4th-century BC Greek Cynic philosopher",
+      "extract": "Diogenes the Cynic, also known as Diogenes of Sinope, was an ancient Greek philosopher during the period of Classical Greece, and one of the founders of Cynicism.",
+      "revision": "1379776692",
+      "requested": "Diogenes"
+    },
+    "crates": {
+      "title": "Crates of Thebes",
+      "url": "https://en.wikipedia.org/wiki/Crates_of_Thebes",
+      "description": "Cynic philosopher",
+      "extract": "Crates of Thebes was a Greek Cynic philosopher, the principal pupil of Diogenes of Sinope and the husband of Hipparchia of Maroneia who lived in the same manner as he. Crates gave away his money to live a life of poverty on the streets of Athens. Respected by the people of Athens, he is remembered for being the teacher of Zeno of Citium, the founder of Stoicism. Various fragments of Crates' teachings survive, including his description of the ideal Cynic state.",
+      "revision": "1367372863",
+      "requested": "Crates of Thebes"
+    },
+    "xenocrates": {
+      "title": "Xenocrates",
+      "url": "https://en.wikipedia.org/wiki/Xenocrates",
+      "description": "4th-century BC Greek philosopher, mathematician and scholarch",
+      "extract": "Xenocrates of Chalcedon was a Greek philosopher, mathematician, and leader (scholarch) of the Platonic Academy from 339/8 to 314/3 BC. His teachings followed those of Plato, which he attempted to define more closely, often with mathematical elements. He distinguished three forms of being: the sensible, the intelligible, and a third compounded of the two, to which correspond respectively, sense, intellect and opinion. He considered unity and duality to be gods which rule the universe, and the soul a self-moving number. God pervades all things, and there are daemonical powers, intermediate between the divine and the mortal, which consist in conditions of the soul. He held that mathematical objects and the Platonic Ideas are identical, unlike Plato who distinguished them. In ethics, he taught that virtue produces happiness, but external goods can minister to it and enable it to effect its purpose.",
+      "revision": "1379939221",
+      "requested": "Xenocrates"
+    },
+    "monimus": {
+      "title": "Monimus",
+      "url": "https://en.wikipedia.org/wiki/Monimus",
+      "description": "Ancient Greek philosopher",
+      "extract": "Monimus of Syracuse, Magna Graecia, was a Cynic philosopher, and a notable student of Diogenes.",
+      "revision": "1378063103",
+      "requested": "Monimus"
+    },
+    "menippus": {
+      "title": "Menippus",
+      "url": "https://en.wikipedia.org/wiki/Menippus",
+      "description": "3rd-century BC Greek Cynic satirist",
+      "extract": "Menippus of Gadara was a Cynic satirist. The Menippean satire genre is named after him. His works, all of which are lost, were an important influence on Varro and Lucian, who ranks Menippus with Antisthenes, Diogenes, and Crates as among the most notable of the Cynics.",
+      "revision": "1364841321",
+      "requested": "Menippus"
+    },
+    "epicurus": {
+      "title": "Epicurus",
+      "url": "https://en.wikipedia.org/wiki/Epicurus",
+      "description": "Ancient Greek philosopher (341–270 BC)",
+      "extract": "Epicurus was an ancient Greek philosopher who founded the philosophical school of Epicureanism, which teaches that management of one's desires, removal of unnecessary fears, friendship, and virtuous living lead to a pleasant life and constant happiness, the highest good.",
+      "revision": "1379475008",
+      "requested": "Epicurus"
+    },
+    "chrysippus": {
+      "title": "Chrysippus",
+      "url": "https://en.wikipedia.org/wiki/Chrysippus",
+      "description": "Greek Stoic philosopher (c.279–c.206 BC)",
+      "extract": "Chrysippus of Soli was a Greek Stoic philosopher. He was a native of Soli, Cilicia, but moved to Athens as a young man, where he became a pupil of the Stoic philosopher Cleanthes. When Cleanthes died, around 230 BC, Chrysippus became the third head of the Stoic school. A prolific writer, Chrysippus expanded the fundamental doctrines of Cleanthes' mentor Zeno of Citium, the founder and first head of the school, which earned him the title of the Second Founder of Stoicism.",
+      "revision": "1366373021",
+      "requested": "Chrysippus"
+    },
+    "epictetus": {
+      "title": "Epictetus",
+      "url": "https://en.wikipedia.org/wiki/Epictetus",
+      "description": "Greek Stoic philosopher (c. 50 – c. 135)",
+      "extract": "Epictetus was a Greek Stoic philosopher. He was born into slavery at Hierapolis, Phrygia and lived in Rome until his banishment, after which he spent the rest of his life in Nicopolis in northwestern Greece.",
+      "revision": "1364934656",
+      "requested": "Epictetus"
+    },
+    "euphrates": {
+      "title": "Euphrates the Stoic",
+      "url": "https://en.wikipedia.org/wiki/Euphrates_the_Stoic",
+      "description": "Roman Stoic philosopher (c. 35 – c. 118)",
+      "extract": "Euphrates was a Stoic philosopher, who lived c. 35–118 AD.",
+      "revision": "1342404517",
+      "requested": "Euphrates the Stoic"
+    },
+    "hippocrates": {
+      "title": "Hippocrates",
+      "url": "https://en.wikipedia.org/wiki/Hippocrates",
+      "description": "Ancient Greek physician (c. 460 – c. 370 BCE)",
+      "extract": "Hippocrates of Kos, also known as Hippocrates II, named after his grandfather Hippocrates I was a Greek physician and philosopher of the classical period who is considered one of the most outstanding figures in the history of medicine. He is traditionally referred to as the \"Father of Medicine\" in recognition of his lasting contributions to the field, such as the use of prognosis and clinical observation, the systematic categorization of diseases, and the formulation of humoral theory. His studies set out the basic ideas of modern-day specialties, including surgery, urology, neurology, acute medicine and orthopedics, and advanced the systematic study of clinical medicine.",
+      "revision": "1377462590",
+      "requested": "Hippocrates"
+    },
+    "archimedes": {
+      "title": "Archimedes",
+      "url": "https://en.wikipedia.org/wiki/Archimedes",
+      "description": "Greek mathematician and physicist (c. 287 – 212 BC)",
+      "extract": "Archimedes of Syracuse was an Ancient Greek mathematician, physicist, engineer, astronomer, and inventor from the city of Syracuse in Sicily. Although few details of his life are known, based on his surviving work, he is considered one of the leading scientists in classical antiquity, and one of the greatest mathematicians of all time. Archimedes anticipated modern calculus and analysis by applying the concept of the infinitesimals and the method of exhaustion to derive and rigorously prove many geometrical theorems, including the area of a circle, the surface area and volume of a sphere, the area of an ellipse, the area under a parabola, the volume of a segment of a paraboloid of revolution, the volume of a segment of a hyperboloid of revolution, and the area of a spiral.",
+      "revision": "1376063220",
+      "requested": "Archimedes"
+    },
+    "hipparchus": {
+      "title": "Hipparchus",
+      "url": "https://en.wikipedia.org/wiki/Hipparchus",
+      "description": "Greek astronomer, geographer and mathematician (c. 190 – c. 120 BCE)",
+      "extract": "Hipparchus was a Greek astronomer, geographer, and mathematician. He is considered the founder of trigonometry, but is most famous for his incidental discovery of the precession of the equinoxes. Hipparchus was born in Nicaea, Bithynia, and probably died on the island of Rhodes, Greece. He is known to have been a working astronomer between 162 and 127 BC.",
+      "revision": "1373939794",
+      "requested": "Hipparchus"
+    },
+    "eudoxus": {
+      "title": "Eudoxus of Cnidus",
+      "url": "https://en.wikipedia.org/wiki/Eudoxus_of_Cnidus",
+      "description": "Greek astronomer and mathematician (c.390–c.340 BC)",
+      "extract": "Eudoxus of Cnidus was an ancient Greek astronomer, mathematician, doctor, and lawmaker. He was a student of Archytas and Plato. All of his original works are lost, though some fragments are preserved in Hipparchus's Commentaries on the Phenomena of Aratus and Eudoxus. Spherics by Theodosius of Bithynia may be based on a work by Eudoxus.",
+      "revision": "1373209694",
+      "requested": "Eudoxus of Cnidus"
+    },
+    "pindar": {
+      "title": "Pindar",
+      "url": "https://en.wikipedia.org/wiki/Pindar",
+      "description": "5th-century BC Greek lyric poet",
+      "extract": "Pindar was an Ancient Greek lyric poet from Thebes. Of the canonical nine lyric poets of ancient Greece, his work is the best preserved. Quintilian wrote, \"Of the nine lyric poets, Pindar is by far the greatest, in virtue of his inspired magnificence, the beauty of his thoughts and figures, the rich exuberance of his language and matter, and his rolling flood of eloquence, characteristics which, as Horace rightly held, make him inimitable.\" His poems can also, however, seem difficult and even peculiar. The Athenian comic playwright Eupolis once remarked that they \"are already reduced to silence by the disinclination of the multitude for elegant learning\".",
+      "revision": "1377727951",
+      "requested": "Pindar"
+    },
+    "charax": {
+      "title": "Aulus Claudius Charax",
+      "url": "https://en.wikipedia.org/wiki/Aulus_Claudius_Charax",
+      "description": "",
+      "extract": "Aulus Claudius Charax was a Roman senator and historian of the second century AD, who held a number of offices in the emperor's service. He served as suffect consul for the nundinium April–June 147 with Quintus Fuficius Cornutus as his colleague. Charax wrote a history, Hellenika, in forty books, of which only fragments survive.",
+      "revision": "1348231677",
+      "requested": "Aulus Claudius Charax"
+    }
+  }
+}
