@@ -1,0 +1,826 @@
+[
+  {
+    "id": "cast-out-judgment",
+    "discipline": "Judgment",
+    "maxim": "Cast out the judgment “I am harmed,” and the harm is gone.",
+    "verseIds": [
+      "II.15",
+      "III.9",
+      "III.15",
+      "IV.7",
+      "IV.11",
+      "IV.39",
+      "VIII.38",
+      "VIII.40",
+      "IX.13",
+      "XII.8",
+      "XII.22",
+      "XII.25"
+    ]
+  },
+  {
+    "id": "things-outside-door",
+    "discipline": "Judgment",
+    "maxim": "Things stand outside the door; only your judgment lets them in.",
+    "verseIds": [
+      "IV.8",
+      "V.19",
+      "VI.41",
+      "VI.52",
+      "VII.14",
+      "VII.16",
+      "VIII.49",
+      "IX.15",
+      "XI.11",
+      "XI.16"
+    ]
+  },
+  {
+    "id": "strip-it-bare",
+    "discipline": "Judgment",
+    "maxim": "See each thing bare: its stuff, its cause, how long it lasts.",
+    "verseIds": [
+      "III.11",
+      "VI.3",
+      "VI.13",
+      "VIII.11",
+      "VIII.13",
+      "VIII.24",
+      "IX.25",
+      "IX.36",
+      "XI.2",
+      "XI.17",
+      "XII.10",
+      "XII.18",
+      "XII.29"
+    ]
+  },
+  {
+    "id": "guard-the-mind",
+    "discipline": "Judgment",
+    "maxim": "Your mind takes the colour of its thoughts; choose them well.",
+    "verseIds": [
+      "V.2",
+      "V.11",
+      "V.16",
+      "VII.17",
+      "VII.24",
+      "VII.29",
+      "VII.37",
+      "VIII.29",
+      "IX.7",
+      "X.24",
+      "XI.19",
+      "XII.19",
+      "XII.33"
+    ]
+  },
+  {
+    "id": "retreat-within",
+    "discipline": "Judgment",
+    "maxim": "No retreat is quieter than your own mind; go there often.",
+    "verseIds": [
+      "IV.3",
+      "VI.11",
+      "VII.28",
+      "VIII.48",
+      "X.23",
+      "XI.12",
+      "XI.22",
+      "XII.3"
+    ]
+  },
+  {
+    "id": "spring-within",
+    "discipline": "Judgment",
+    "maxim": "Within you is a spring of good; keep digging and it flows.",
+    "verseIds": [
+      "VII.59",
+      "VIII.51",
+      "VIII.54",
+      "VIII.57",
+      "VIII.60",
+      "XII.15"
+    ]
+  },
+  {
+    "id": "mind-not-flesh",
+    "discipline": "Judgment",
+    "maxim": "You are a mind, not the puppet of flesh and breath.",
+    "verseIds": [
+      "II.2",
+      "IV.41",
+      "V.21",
+      "V.26",
+      "VI.8",
+      "IX.26",
+      "X.38",
+      "XI.1",
+      "XI.20"
+    ]
+  },
+  {
+    "id": "pain",
+    "discipline": "Judgment",
+    "maxim": "Pain is bearable or brief; don't let imagination add to it.",
+    "verseIds": [
+      "VI.29",
+      "VI.33",
+      "VII.33",
+      "VII.51",
+      "VII.64",
+      "VIII.28",
+      "VIII.42",
+      "VIII.47",
+      "IX.41"
+    ]
+  },
+  {
+    "id": "only-virtue-good",
+    "discipline": "Judgment",
+    "maxim": "Only character is truly good; wealth, fame and pleasure are not.",
+    "verseIds": [
+      "II.10",
+      "II.11",
+      "V.12",
+      "V.15",
+      "V.37",
+      "VI.14",
+      "VI.16",
+      "VI.51",
+      "VII.3",
+      "VIII.10",
+      "VIII.26",
+      "VIII.39",
+      "IX.16",
+      "XI.30"
+    ]
+  },
+  {
+    "id": "whose-praise",
+    "discipline": "Judgment",
+    "maxim": "Before you crave their praise, look closely at the minds behind it.",
+    "verseIds": [
+      "IV.38",
+      "V.3",
+      "VII.62",
+      "VIII.53",
+      "IX.18",
+      "IX.27",
+      "IX.34",
+      "X.13",
+      "XI.14",
+      "XI.23",
+      "XI.32",
+      "XII.2",
+      "XII.4"
+    ]
+  },
+  {
+    "id": "woven-for-you",
+    "discipline": "Acceptance",
+    "maxim": "Whatever happens was woven for you, and serves the whole.",
+    "verseIds": [
+      "II.3",
+      "IV.9",
+      "IV.10",
+      "V.8",
+      "VI.1",
+      "VI.9",
+      "VI.45",
+      "VI.54",
+      "X.5",
+      "X.20",
+      "XI.10"
+    ]
+  },
+  {
+    "id": "love-your-lot",
+    "discipline": "Acceptance",
+    "maxim": "Love what falls to your lot; want what actually comes.",
+    "verseIds": [
+      "IV.23",
+      "IV.26",
+      "IV.34",
+      "VII.27",
+      "VII.57",
+      "VIII.33",
+      "X.14",
+      "X.21",
+      "X.25",
+      "X.28",
+      "X.35",
+      "XII.11"
+    ]
+  },
+  {
+    "id": "providence-or-atoms",
+    "discipline": "Acceptance",
+    "maxim": "Providence or atoms: either way, you need not be troubled.",
+    "verseIds": [
+      "IV.27",
+      "V.7",
+      "VI.10",
+      "VI.44",
+      "VI.55",
+      "VII.41",
+      "VII.75",
+      "IX.28",
+      "IX.39",
+      "IX.40",
+      "X.22",
+      "XII.5",
+      "XII.14",
+      "XII.28"
+    ]
+  },
+  {
+    "id": "headland",
+    "discipline": "Acceptance",
+    "maxim": "Be the headland: the waves break, and you stand.",
+    "verseIds": [
+      "IV.49",
+      "V.10",
+      "V.18",
+      "V.36",
+      "VII.38",
+      "VII.43",
+      "VII.61",
+      "VIII.46",
+      "VIII.50",
+      "IX.37",
+      "X.3"
+    ]
+  },
+  {
+    "id": "one-living-being",
+    "discipline": "Acceptance",
+    "maxim": "The universe is one living being; everything in it is kin.",
+    "verseIds": [
+      "II.9",
+      "III.2",
+      "IV.40",
+      "IV.45",
+      "IV.46",
+      "VI.5",
+      "VI.25",
+      "VI.36",
+      "VI.38",
+      "VI.40",
+      "VII.9",
+      "IX.8",
+      "IX.9",
+      "X.6",
+      "X.26",
+      "XII.30"
+    ]
+  },
+  {
+    "id": "change",
+    "discipline": "Acceptance",
+    "maxim": "Nature loves change above all; why should you fear it?",
+    "verseIds": [
+      "IV.36",
+      "VII.18",
+      "VII.25",
+      "IX.19",
+      "IX.35",
+      "X.18",
+      "XII.21"
+    ]
+  },
+  {
+    "id": "nothing-lost",
+    "discipline": "Acceptance",
+    "maxim": "Nothing is lost, only remade into something else.",
+    "verseIds": [
+      "IV.21",
+      "IV.42",
+      "V.13",
+      "VI.4",
+      "VII.23",
+      "VIII.6",
+      "VIII.18",
+      "X.7",
+      "XI.35"
+    ]
+  },
+  {
+    "id": "river",
+    "discipline": "Acceptance",
+    "maxim": "Time is a river; all you see is already passing.",
+    "verseIds": [
+      "IV.43",
+      "V.23",
+      "V.33",
+      "VI.15",
+      "VII.10",
+      "VII.19",
+      "IX.24",
+      "X.31",
+      "X.34"
+    ]
+  },
+  {
+    "id": "nothing-new",
+    "discipline": "Acceptance",
+    "maxim": "There is nothing new: the same play, with different actors.",
+    "verseIds": [
+      "IV.32",
+      "IV.44",
+      "VI.37",
+      "VI.46",
+      "VII.1",
+      "VII.49",
+      "VIII.15",
+      "IX.14",
+      "X.27",
+      "XI.6",
+      "XI.33",
+      "XII.13"
+    ]
+  },
+  {
+    "id": "view-from-above",
+    "discipline": "Acceptance",
+    "maxim": "Look down from above: how small and brief it all is.",
+    "verseIds": [
+      "V.24",
+      "V.32",
+      "VII.35",
+      "VII.47",
+      "VII.48",
+      "VIII.52",
+      "IX.30",
+      "IX.32",
+      "X.15",
+      "X.17",
+      "XI.27",
+      "XII.32"
+    ]
+  },
+  {
+    "id": "fame",
+    "discipline": "Acceptance",
+    "maxim": "Fame is an echo among people who will soon be forgotten too.",
+    "verseIds": [
+      "IV.19",
+      "IV.20",
+      "IV.33",
+      "IV.35",
+      "VI.18",
+      "VI.59",
+      "VII.6",
+      "VII.21",
+      "VII.34",
+      "VIII.21",
+      "VIII.44"
+    ]
+  },
+  {
+    "id": "great-men-died",
+    "discipline": "Acceptance",
+    "maxim": "Alexander and his stable boy came to the same end.",
+    "verseIds": [
+      "III.3",
+      "IV.15",
+      "IV.48",
+      "VI.24",
+      "VI.47",
+      "VI.56",
+      "VIII.25",
+      "VIII.31",
+      "VIII.37",
+      "IX.33",
+      "XII.27"
+    ]
+  },
+  {
+    "id": "death-natural",
+    "discipline": "Acceptance",
+    "maxim": "Death is natural as birth; fall like a ripe olive, grateful.",
+    "verseIds": [
+      "II.12",
+      "II.17",
+      "IV.5",
+      "IV.14",
+      "V.4",
+      "V.29",
+      "VI.28",
+      "VII.40",
+      "IX.3",
+      "IX.21",
+      "X.36",
+      "XI.34"
+    ]
+  },
+  {
+    "id": "death-either-way",
+    "discipline": "Acceptance",
+    "maxim": "Scattered or changed, death holds nothing to fear.",
+    "verseIds": [
+      "VII.32",
+      "VII.50",
+      "VIII.58",
+      "XI.3",
+      "XII.7",
+      "XII.34"
+    ]
+  },
+  {
+    "id": "whole-play",
+    "discipline": "Acceptance",
+    "maxim": "Three acts can be the whole play; length is not what matters.",
+    "verseIds": [
+      "IV.47",
+      "IV.50",
+      "VI.49",
+      "VIII.20",
+      "IX.17",
+      "XII.23",
+      "XII.35",
+      "XII.36"
+    ]
+  },
+  {
+    "id": "present",
+    "discipline": "Acceptance",
+    "maxim": "You only ever live, and only ever lose, this present moment.",
+    "verseIds": [
+      "II.14",
+      "III.10",
+      "III.12",
+      "VI.32",
+      "VII.8",
+      "VII.54",
+      "VIII.36",
+      "IX.6",
+      "XII.1"
+    ]
+  },
+  {
+    "id": "time-short",
+    "discipline": "Acceptance",
+    "maxim": "Time is short; stop putting off the life you mean to live.",
+    "verseIds": [
+      "II.4",
+      "II.5",
+      "II.6",
+      "III.1",
+      "III.14",
+      "IV.17",
+      "IV.37",
+      "VII.56",
+      "VII.69",
+      "VIII.2",
+      "X.29"
+    ]
+  },
+  {
+    "id": "debts",
+    "discipline": "Action",
+    "maxim": "Remember those who formed you, and what each of them gave.",
+    "verseIds": [
+      "I.1",
+      "I.2",
+      "I.3",
+      "I.4",
+      "I.5",
+      "I.17"
+    ]
+  },
+  {
+    "id": "teachers",
+    "discipline": "Action",
+    "maxim": "Learn from good teachers: plainness, patience, steadiness without show.",
+    "verseIds": [
+      "I.6",
+      "I.7",
+      "I.8",
+      "I.9",
+      "I.10",
+      "I.11",
+      "I.12",
+      "I.13",
+      "I.14",
+      "I.15",
+      "I.16",
+      "VI.30"
+    ]
+  },
+  {
+    "id": "sages",
+    "discipline": "Action",
+    "maxim": "Keep the wise in view, and judge them by their souls.",
+    "verseIds": [
+      "VII.44",
+      "VII.45",
+      "VII.46",
+      "VII.66",
+      "XI.26",
+      "XI.28",
+      "XI.39"
+    ]
+  },
+  {
+    "id": "purple",
+    "discipline": "Action",
+    "maxim": "Live well even in a palace; don't be dyed in the purple.",
+    "verseIds": [
+      "IV.28",
+      "VI.12",
+      "VI.34",
+      "VIII.3",
+      "VIII.9",
+      "X.10",
+      "X.19",
+      "XI.7",
+      "XI.25"
+    ]
+  },
+  {
+    "id": "dawn",
+    "discipline": "Action",
+    "maxim": "When you'd rather stay in bed, rise to do a human's work.",
+    "verseIds": [
+      "IV.31",
+      "V.1",
+      "VI.35",
+      "VIII.12",
+      "VIII.19",
+      "IX.12",
+      "XI.5"
+    ]
+  },
+  {
+    "id": "use-reason",
+    "discipline": "Action",
+    "maxim": "You have reason. Why not use it?",
+    "verseIds": [
+      "IV.13",
+      "V.14",
+      "VII.11",
+      "VII.31",
+      "IX.10",
+      "X.2",
+      "XII.31"
+    ]
+  },
+  {
+    "id": "in-your-power",
+    "discipline": "Action",
+    "maxim": "No one can stop you being honest, kind and free.",
+    "verseIds": [
+      "V.5",
+      "V.34",
+      "VI.17",
+      "VI.19",
+      "VI.58",
+      "VII.53",
+      "VII.67",
+      "VII.72",
+      "VIII.7",
+      "VIII.8",
+      "XI.36",
+      "XI.37"
+    ]
+  },
+  {
+    "id": "be-good-now",
+    "discipline": "Action",
+    "maxim": "Stop arguing about what a good person is. Be one.",
+    "verseIds": [
+      "IV.25",
+      "VII.15",
+      "VII.42",
+      "VII.52",
+      "VIII.5",
+      "VIII.22",
+      "X.1",
+      "X.8",
+      "X.16",
+      "X.32"
+    ]
+  },
+  {
+    "id": "upright",
+    "discipline": "Action",
+    "maxim": "Stand upright by yourself; don't be held upright.",
+    "verseIds": [
+      "III.5",
+      "III.6",
+      "III.7",
+      "III.8",
+      "III.16",
+      "V.27",
+      "VII.12",
+      "VII.60",
+      "VIII.30",
+      "VIII.45",
+      "XI.15",
+      "XII.17"
+    ]
+  },
+  {
+    "id": "principles-at-hand",
+    "discipline": "Action",
+    "maxim": "Keep your principles at hand, and return to them when you slip.",
+    "verseIds": [
+      "III.13",
+      "IV.16",
+      "IV.30",
+      "V.9",
+      "V.31",
+      "VI.31",
+      "VII.2",
+      "VIII.1",
+      "XI.29",
+      "XI.38",
+      "XII.6",
+      "XII.9",
+      "XII.24",
+      "XII.26"
+    ]
+  },
+  {
+    "id": "open-to-correction",
+    "discipline": "Action",
+    "maxim": "Listen closely, accept help, and be glad to be corrected.",
+    "verseIds": [
+      "IV.12",
+      "VI.21",
+      "VI.53",
+      "VII.4",
+      "VII.5",
+      "VII.7",
+      "VII.30",
+      "VIII.16"
+    ]
+  },
+  {
+    "id": "necessary",
+    "discipline": "Action",
+    "maxim": "Ask of every act and thought: is this necessary?",
+    "verseIds": [
+      "II.7",
+      "II.16",
+      "IV.24",
+      "IV.51",
+      "VI.2",
+      "VI.22",
+      "VI.26",
+      "VII.20",
+      "IX.29",
+      "X.9",
+      "X.12"
+    ]
+  },
+  {
+    "id": "own-business",
+    "discipline": "Action",
+    "maxim": "Tend your own mind; don't waste life guessing at others'.",
+    "verseIds": [
+      "II.8",
+      "II.13",
+      "III.4",
+      "IV.18",
+      "VII.55",
+      "X.37"
+    ]
+  },
+  {
+    "id": "obstacle-way",
+    "discipline": "Action",
+    "maxim": "What stands in the way becomes the way.",
+    "verseIds": [
+      "IV.1",
+      "V.20",
+      "VI.50",
+      "VII.68",
+      "VIII.32",
+      "VIII.35",
+      "VIII.41",
+      "X.33"
+    ]
+  },
+  {
+    "id": "made-for-one-another",
+    "discipline": "Action",
+    "maxim": "We were made for one another, like hands and feet.",
+    "verseIds": [
+      "IV.4",
+      "IV.29",
+      "V.22",
+      "V.30",
+      "V.35",
+      "VI.42",
+      "VI.43",
+      "VIII.34",
+      "IX.1",
+      "XI.8"
+    ]
+  },
+  {
+    "id": "common-good",
+    "discipline": "Action",
+    "maxim": "Aim every act at the common good; that is your work.",
+    "verseIds": [
+      "IV.2",
+      "IV.22",
+      "VI.7",
+      "VI.23",
+      "VIII.23",
+      "VIII.27",
+      "IX.5",
+      "IX.22",
+      "IX.23",
+      "IX.31",
+      "X.11",
+      "XI.4",
+      "XI.21",
+      "XII.20"
+    ]
+  },
+  {
+    "id": "vine",
+    "discipline": "Action",
+    "maxim": "Do good as a vine bears grapes, then move on.",
+    "verseIds": [
+      "V.6",
+      "VII.36",
+      "VII.39",
+      "VII.73",
+      "VII.74",
+      "XI.24",
+      "XI.31"
+    ]
+  },
+  {
+    "id": "love-stumblers",
+    "discipline": "Action",
+    "maxim": "Love people even when they stumble; they are your kin.",
+    "verseIds": [
+      "II.1",
+      "VI.20",
+      "VI.39",
+      "VI.48",
+      "VII.13",
+      "VII.22",
+      "VII.65",
+      "VIII.43",
+      "VIII.61"
+    ]
+  },
+  {
+    "id": "they-know-not",
+    "discipline": "Action",
+    "maxim": "Expect people to do wrong; they act from ignorance, as you have.",
+    "verseIds": [
+      "IV.6",
+      "V.17",
+      "VI.57",
+      "VII.26",
+      "VII.63",
+      "VIII.4",
+      "VIII.14",
+      "IX.42",
+      "X.30",
+      "XII.12",
+      "XII.16"
+    ]
+  },
+  {
+    "id": "teach-or-bear",
+    "discipline": "Action",
+    "maxim": "If they go wrong, teach them kindly, or bear with them.",
+    "verseIds": [
+      "V.28",
+      "VI.27",
+      "VII.70",
+      "VIII.17",
+      "VIII.59",
+      "IX.11",
+      "X.4",
+      "XI.9",
+      "XI.13",
+      "XI.18"
+    ]
+  },
+  {
+    "id": "leave-the-wrong",
+    "discipline": "Action",
+    "maxim": "Another's wrong belongs to them; leave it where it is.",
+    "verseIds": [
+      "V.25",
+      "VI.6",
+      "VII.58",
+      "VII.71",
+      "VIII.55",
+      "VIII.56",
+      "IX.2",
+      "IX.4",
+      "IX.20",
+      "IX.38"
+    ]
+  }
+]
