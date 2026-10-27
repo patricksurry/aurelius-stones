@@ -648,6 +648,19 @@
       margin-right: 0.5rem;
     }
 
+    .map-field {
+      font: inherit;
+      font-style: normal;
+      color: var(--ink);
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--ink-faint);
+      outline: none;
+      width: 14rem;
+      max-width: 50vw;
+      margin-right: 0.5rem;
+    }
+
     .map-book {
       display: grid;
       grid-template-columns: 2.75rem 1fr;
@@ -1006,8 +1019,9 @@
     }
 
     // Filled in by sync.js when sign-in is available: the map shows its links
-    // (sign in, then a choice of provider, or sign out) and any short note
-    const account = { links: [], note: '' };
+    // (sign in, then a choice of provider, or sign out), any short note,
+    // and an optional field (an email address for a sign-in link)
+    const account = { links: [], note: '', field: null };
 
     function isClaimed(stoneId) {
       const stone = STONE_BY_ID[stoneId];
@@ -1306,6 +1320,7 @@
             <span>${state.read.size} of ${VERSES.length} passages read · ${claimedCount} of ${STONES.length} stones claimed</span>
             <span>
               ${account.note ? `<span class="map-note">${escapeHtml(account.note)}</span>` : ''}
+              ${account.field ? `<input class="map-field" type="email" autocomplete="email" placeholder="${escapeHtml(account.field.placeholder)}">` : ''}
               ${account.links.map((l, i) => `<button class="quiet-btn" data-account="${i}" title="${escapeHtml(l.title || '')}">${escapeHtml(l.label)}</button>`).join(' ')}
               <button class="quiet-btn" id="mapAbout">about</button>
               <button class="quiet-btn" id="mapClose" title="Close (Esc)">close</button>
@@ -1341,6 +1356,11 @@
       mapEl.querySelectorAll('[data-account]').forEach(btn => {
         btn.addEventListener('click', () => account.links[btn.dataset.account].act());
       });
+      const field = mapEl.querySelector('.map-field');
+      if (field) {
+        field.addEventListener('keydown', (e) => { if (e.key === 'Enter') account.field.submit(field.value.trim()); });
+        field.focus();
+      }
 
       // Pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages
       const hover = document.getElementById('mapHover');
@@ -1572,7 +1592,7 @@
     });
 
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'TEXTAREA') {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
         // Writing: let the controls fall away
         document.body.classList.add('idle');
         if (e.key === 'Escape') e.target.blur();

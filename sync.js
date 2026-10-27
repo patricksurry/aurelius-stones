@@ -1,4 +1,4 @@
-// Optional cross-device sync: sign in with Google or GitHub, and your progress is kept
+// Optional cross-device sync: sign in with Google, GitHub or an emailed link, and your progress is kept
 // in Firestore at progress/{uid}, readable only by you (see firestore.rules).
 // Reading needs no account; this module only adds sign-in links to the map.
 // It talks to index.html through progressSnapshot(), mergeProgress(), the
@@ -7,6 +7,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {
   getAuth, onAuthStateChanged, signInWithPopup, signOut, linkWithCredential,
+  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
   GoogleAuthProvider, GithubAuthProvider
 } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 
@@ -22,22 +23,26 @@ const app = initializeApp({
 const auth = getAuth(app);
 
 const PUSH_DELAY_MS = 2000;
+// Where we remember the address a sign-in link was sent to, to finish signing in when it's opened
+const EMAIL_KEY = 'meditations_signin_email';
 let stopListening = null;
 let pushTimer = null;
 let push = null;
 
 const PROVIDERS = [
   { label: 'Google', make: () => new GoogleAuthProvider(), cls: GoogleAuthProvider },
-  { label: 'GitHub', make: () => new GithubAuthProvider(), cls: GithubAuthProvider }
+  { label: 'GitHub', make: () => new GithubAuthProvider(), cls: GithubAuthProvider },
+  { label: 'email' }
 ];
 
 // One account per email: signing in with GitHub after first using Google (same email)
 // is refused, so we keep that GitHub credential and link it after the original sign-in.
 let pendingLink = null;
 
-function showLinks(links, note = '') {
+function showLinks(links, note = '', field = null) {
   account.links = links;
   account.note = note;
+  account.field = field;
   if (state.mapOpen) renderMap();
 }
 
@@ -46,16 +51,48 @@ function showSignedOut(note) {
 }
 
 function showChoice(note = 'sign in with') {
-  showLinks(PROVIDERS.map(p => ({ label: p.label, act: () => signInWith(p) })), note);
+  showLinks(PROVIDERS.map(p => ({ label: p.label, act: () => (p.make ? signInWith(p) : askEmail()) })), note);
+}
+
+// Ask for an address, then do something with it (send a link, or confirm one opened on another device)
+function askEmail(note = '', then = sendLink, action = 'send link') {
+  const field = { placeholder: 'your email', submit: (email) => { if (email.includes('@')) then(email); } };
+  showLinks([{ label: action, act: () => field.submit((document.querySelector('.map-field')?.value || '').trim()) }], note, field);
+}
+
+async function sendLink(email) {
+  try {
+    await sendSignInLinkToEmail(auth, email, { url: location.origin + location.pathname, handleCodeInApp: true });
+    store(EMAIL_KEY, email);
+    showSignedOut(`A sign-in link is on its way to ${email}`);
+  } catch (e) {
+    console.warn('Sending the sign-in link failed', e);
+    askEmail('That didn’t send; check the address');
+  }
+}
+
+async function finishEmailLink(email) {
+  try {
+    const { user } = await signInWithEmailLink(auth, email, location.href);
+    await afterSignIn(user);
+  } catch (e) {
+    console.warn('Email sign-in failed', e);
+    showSignedOut('That link has expired or was already used; ask for a new one');
+  }
+  localStorage.removeItem(EMAIL_KEY);
+  history.replaceState(null, '', location.pathname);
+}
+
+async function afterSignIn(user) {
+  if (!pendingLink) return;
+  await linkWithCredential(user, pendingLink).catch(e => console.warn('Linking failed', e));
+  pendingLink = null;
 }
 
 async function signInWith(p) {
   try {
     const { user } = await signInWithPopup(auth, p.make());
-    if (pendingLink) {
-      await linkWithCredential(user, pendingLink).catch(e => console.warn('Linking failed', e));
-      pendingLink = null;
-    }
+    await afterSignIn(user);
   } catch (e) {
     if (e.code === 'auth/account-exists-with-different-credential') {
       pendingLink = p.cls.credentialFromError(e);
@@ -129,3 +166,15 @@ onAuthStateChanged(auth, (user) => {
   showAccount(user);
   if (user) startSync(user);
 });
+
+// Arriving from a sign-in link: finish signing in. Opened in another browser
+// than the one that asked for it, we need the address again to be sure it's yours.
+if (isSignInWithEmailLink(auth, location.href)) {
+  const email = load(EMAIL_KEY, null);
+  if (email) {
+    finishEmailLink(email);
+  } else {
+    if (!state.mapOpen) toggleMap();
+    askEmail('to finish signing in, confirm', finishEmailLink, 'sign in');
+  }
+}
