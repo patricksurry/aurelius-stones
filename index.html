@@ -974,7 +974,34 @@
 
     function save() {
       store('meditations_full_v1', state.claimed);
+      document.dispatchEvent(new Event('progress'));
     }
+
+    // Cross-device sync (sync.js) exchanges this with the signed-in reader's copy.
+    // Passages read only accumulate; for each stone the latest edit wins,
+    // which is why an un-claimed stone keeps an entry with its time (t).
+    function progressSnapshot() {
+      return { claimed: state.claimed, read: [...state.read] };
+    }
+
+    function mergeProgress(remote) {
+      let changed = false;
+      for (const ref of remote.read || []) {
+        if (VERSE_BY_ID[ref] && !state.read.has(ref)) { state.read.add(ref); changed = true; }
+      }
+      for (const [id, theirs] of Object.entries(remote.claimed || {})) {
+        const ours = state.claimed[id];
+        if (STONE_BY_ID[id] && (!ours || (theirs.t || 0) > (ours.t || 0))) { state.claimed[id] = theirs; changed = true; }
+      }
+      if (changed) {
+        store('meditations_full_v1', state.claimed);
+        store('meditations_read_v1', [...state.read]);
+      }
+      return changed;
+    }
+
+    // Filled in by sync.js when sign-in is available: the map shows a sign in / out link
+    const account = { label: '', title: '', toggle: null };
 
     function isClaimed(stoneId) {
       const stone = STONE_BY_ID[stoneId];
@@ -1117,11 +1144,7 @@
           const mVal = maximField.value.trim();
           const rVal = reflectionField.value.trim();
           const changedMaxim = Boolean(mVal) && mVal !== stone.defaultMaxim;
-          if (changedMaxim || rVal) {
-            state.claimed[stone.id] = { maxim: changedMaxim ? mVal : stone.defaultMaxim, reflection: rVal };
-          } else {
-            delete state.claimed[stone.id];
-          }
+          state.claimed[stone.id] = { maxim: changedMaxim ? mVal : stone.defaultMaxim, reflection: rVal, t: Date.now() };
           save();
           document.getElementById('suggestedMaxim').hidden = !changedMaxim;
           ownWordsField.hidden = changedMaxim;
@@ -1276,6 +1299,7 @@
           <div class="map-head">
             <span>${state.read.size} of ${VERSES.length} passages read · ${claimedCount} of ${STONES.length} stones claimed</span>
             <span>
+              ${account.toggle ? `<button class="quiet-btn" id="mapAccount" title="${escapeHtml(account.title)}">${escapeHtml(account.label)}</button>` : ''}
               <button class="quiet-btn" id="mapAbout">about</button>
               <button class="quiet-btn" id="mapClose" title="Close (Esc)">close</button>
             </span>
@@ -1307,6 +1331,7 @@
 
       document.getElementById('mapClose').addEventListener('click', toggleMap);
       document.getElementById('mapAbout').addEventListener('click', () => { toggleMap(); showWelcome(); });
+      if (account.toggle) document.getElementById('mapAccount').addEventListener('click', account.toggle);
 
       // Pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages
       const hover = document.getElementById('mapHover');
@@ -1452,6 +1477,7 @@
     function markRead(ref) {
       state.read.add(ref);
       store('meditations_read_v1', [...state.read]);
+      document.dispatchEvent(new Event('progress'));
       const activeRef = document.getElementById('activeRef');
       if (activeRef) activeRef.classList.add('read');
       const currentDot = document.querySelector('.pager-dot.current');
@@ -1587,5 +1613,6 @@
     wake();
     if (!load('meditations_welcomed_v1', false)) showWelcome();
   </script>
+  <script type="module" src="sync.js"></script>
 </body>
 </html>
