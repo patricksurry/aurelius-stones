@@ -633,22 +633,67 @@ body.idle .chrome-soft:not(:hover) {
   margin-bottom: 1.25rem;
 }
 
-.map-note {
-  color: var(--ink-faint);
-  margin-right: 0.5rem;
+.map-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 0 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink-faint) 25%, transparent);
+  font-size: 0.95rem;
 }
 
-.map-field {
+/* Sign-in: a quiet line and three small icons */
+.account,
+.map-clear {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+}
+
+.acct-note {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.acct-icons {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.acct-icon {
+  background: none;
+  border: none;
+  padding: 0.2rem;
+  width: 1.7rem;
+  height: 1.7rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.acct-icon:hover,
+.acct-icon:focus-visible {
+  color: var(--ink);
+}
+
+.acct-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.acct-field {
   font: inherit;
-  font-style: normal;
   color: var(--ink);
   background: none;
   border: none;
   border-bottom: 1px solid var(--ink-faint);
   outline: none;
   width: 14rem;
-  max-width: 50vw;
-  margin-right: 0.5rem;
+  max-width: 60vw;
 }
 
 .map-book {
@@ -873,6 +918,11 @@ body.idle .chrome-soft:not(:hover) {
 .welcome-begin:hover {
   border-color: var(--ink);
   background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.welcome-account {
+  margin: -0.25rem 0 1.25rem;
+  font-size: 0.95rem;
 }
 
 .welcome-keys,

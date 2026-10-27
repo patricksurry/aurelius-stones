@@ -41,7 +41,9 @@ let state = {
   claimed: load('meditations_full_v1', {}),
   read: new Set(load('meditations_read_v1', [])),
   // Unfinished "in your own words" summaries, per stone
-  drafts: load('meditations_drafts_v1', {})
+  drafts: load('meditations_drafts_v1', {}),
+  // When progress was last cleared, so a clear reaches your other devices
+  cleared: load('meditations_cleared_v1', 0)
 };
 
 function save() {
@@ -52,12 +54,18 @@ function save() {
 // Cross-device sync (sync.js) exchanges this with the signed-in reader's copy.
 // Passages read only accumulate; for each stone the latest edit wins,
 // which is why an un-claimed stone keeps an entry with its time (t).
+// A newer clear wipes everything older on either side.
 function progressSnapshot() {
-  return { claimed: state.claimed, read: [...state.read] };
+  return { claimed: state.claimed, read: [...state.read], cleared: state.cleared };
 }
 
 function mergeProgress(remote) {
   let changed = false;
+  if ((remote.cleared || 0) < state.cleared) return false;  // theirs predates our clear; ours will replace it
+  if ((remote.cleared || 0) > state.cleared) {
+    wipeProgress(remote.cleared);
+    changed = true;
+  }
   for (const ref of remote.read || []) {
     if (VERSE_BY_ID[ref] && !state.read.has(ref)) { state.read.add(ref); changed = true; }
   }
@@ -72,10 +80,29 @@ function mergeProgress(remote) {
   return changed;
 }
 
-// Filled in by sync.js when sign-in is available: the map shows its links
-// (sign in, then a choice of provider, or sign out), any short note,
-// and an optional field (an email address for a sign-in link)
-const account = { links: [], note: '', field: null };
+function wipeProgress(when) {
+  state.claimed = {};
+  state.read = new Set();
+  state.drafts = {};
+  state.cleared = when;
+  store('meditations_full_v1', state.claimed);
+  store('meditations_read_v1', []);
+  store('meditations_drafts_v1', state.drafts);
+  store('meditations_cleared_v1', when);
+}
+
+// Start over: forget what's been read and claimed, here and (when signed in) everywhere
+function clearProgress() {
+  wipeProgress(Date.now());
+  document.dispatchEvent(new Event('progress'));
+}
+
+// Sign-in state, shown by account.js and driven by sync.js once Firebase loads.
+// mode: 'idle', 'email' (asking for an address) or 'confirm' (finishing a link opened elsewhere)
+const account = {
+  ready: false, user: null, mode: 'idle', note: '',
+  signIn: null, sendLink: null, confirm: null, signOut: null
+};
 
 function isClaimed(stoneId) {
   const stone = STONE_BY_ID[stoneId];

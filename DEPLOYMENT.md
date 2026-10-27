@@ -29,12 +29,13 @@ If you change `firestore.rules`, paste the new version into Firestore → Rules 
 
 ## How sync works
 
-`js/sync.js` loads Firebase from Google's CDN and works with the rest of the app (`js/store.js`) through `progressSnapshot()`, `mergeProgress()`, a `progress` event and the `account` object.
+`js/sync.js` loads Firebase from Google's CDN, and `js/account.js` draws the sign-in choices it provides. They work with the rest of the app (`js/store.js`) through `progressSnapshot()`, `mergeProgress()`, a `progress` event and the `account` object.
 
-- Each signed-in user has one document in Firestore, `progress/{uid}`: `{claimed, read, updated}`.
+- Each signed-in user has one document in Firestore, `progress/{uid}`: `{claimed, read, cleared, updated}`.
 - When you sign in, the browser's own progress is merged with the saved copy:
   - passages read on either side are kept;
-  - for each stone, the latest edit wins (every entry carries a timestamp `t`).
+  - for each stone, the latest edit wins (every entry carries a timestamp `t`);
+  - "clear progress" records when it happened (`cleared`), and a newer clear wipes everything older on either side, so it reaches every device.
 - Changes are saved about 2 seconds after the last edit, and straight away if the tab is hidden.
 - Not synced, kept per browser in `localStorage`: drafts, your place in the book, theme, and the Greek toggle.
 - One account per email: if someone who first used one provider tries another with the same email, they're asked to use the first, and the new provider is then linked to the same account.

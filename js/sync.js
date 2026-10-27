@@ -1,6 +1,6 @@
 // Optional cross-device sync: sign in with Google, GitHub or an emailed link, and your progress is kept
 // in Firestore at progress/{uid}, readable only by you (see firestore.rules).
-// Reading needs no account; this module only adds sign-in links to the map.
+// Reading needs no account; account.js shows the sign-in choices this module provides.
 // It talks to index.html through progressSnapshot(), mergeProgress(), the
 // 'progress' event and the account object, defined in store.js.
 
@@ -29,45 +29,28 @@ let stopListening = null;
 let pushTimer = null;
 let push = null;
 
-const PROVIDERS = [
-  { label: 'Google', make: () => new GoogleAuthProvider(), cls: GoogleAuthProvider },
-  { label: 'GitHub', make: () => new GithubAuthProvider(), cls: GithubAuthProvider },
-  { label: 'email' }
-];
+const PROVIDERS = {
+  google: { label: 'Google', make: () => new GoogleAuthProvider(), cls: GoogleAuthProvider },
+  github: { label: 'GitHub', make: () => new GithubAuthProvider(), cls: GithubAuthProvider }
+};
 
 // One account per email: signing in with GitHub after first using Google (same email)
 // is refused, so we keep that GitHub credential and link it after the original sign-in.
 let pendingLink = null;
 
-function showLinks(links, note = '', field = null) {
-  account.links = links;
-  account.note = note;
-  account.field = field;
-  if (state.mapOpen) renderMap();
-}
-
-function showSignedOut(note) {
-  showLinks([{ label: 'sign in', title: 'Keep your progress across devices', act: showChoice }], note);
-}
-
-function showChoice(note = 'sign in with') {
-  showLinks(PROVIDERS.map(p => ({ label: p.label, act: () => (p.make ? signInWith(p) : askEmail()) })), note);
-}
-
-// Ask for an address, then do something with it (send a link, or confirm one opened on another device)
-function askEmail(note = '', then = sendLink, action = 'send link') {
-  const field = { placeholder: 'your email', submit: (email) => { if (email.includes('@')) then(email); } };
-  showLinks([{ label: action, act: () => field.submit((document.querySelector('.map-field')?.value || '').trim()) }], note, field);
+function show(changes) {
+  Object.assign(account, changes);
+  renderAccount();
 }
 
 async function sendLink(email) {
   try {
     await sendSignInLinkToEmail(auth, email, { url: location.origin + location.pathname, handleCodeInApp: true });
     store(EMAIL_KEY, email);
-    showSignedOut(`A sign-in link is on its way to ${email}`);
+    show({ mode: 'idle', note: `A sign-in link is on its way to ${email}` });
   } catch (e) {
     console.warn('Sending the sign-in link failed', e);
-    askEmail('That didn’t send; check the address');
+    show({ note: 'That didn’t send; check the address' });
   }
 }
 
@@ -77,7 +60,7 @@ async function finishEmailLink(email) {
     await afterSignIn(user);
   } catch (e) {
     console.warn('Email sign-in failed', e);
-    showSignedOut('That link has expired or was already used; ask for a new one');
+    show({ mode: 'idle', note: 'That link has expired or was already used; ask for a new one' });
   }
   localStorage.removeItem(EMAIL_KEY);
   history.replaceState(null, '', location.pathname);
@@ -89,33 +72,29 @@ async function afterSignIn(user) {
   pendingLink = null;
 }
 
-async function signInWith(p) {
+async function signInWith(id) {
+  const p = PROVIDERS[id];
   try {
     const { user } = await signInWithPopup(auth, p.make());
     await afterSignIn(user);
   } catch (e) {
     if (e.code === 'auth/account-exists-with-different-credential') {
       pendingLink = p.cls.credentialFromError(e);
-      const others = PROVIDERS.filter(o => o !== p).map(o => o.label).join(' or ');
-      showChoice(`You've signed in with ${others} before; use that once, and ${p.label} will work too`);
+      show({ mode: 'idle', note: `You've used this email another way before; sign in that way once, and ${p.label} will work too` });
     } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
       console.warn('Sign-in failed', e);
-      showSignedOut('Sign-in didn’t work');
+      show({ mode: 'idle', note: 'Sign-in didn’t work; try again' });
     }
   }
 }
 
-function showAccount(user) {
-  if (user) {
-    showLinks([{
-      label: 'sign out',
-      title: `Signed in as ${user.email || user.displayName}; your progress is kept across devices`,
-      act: () => signOut(auth)
-    }]);
-  } else {
-    showSignedOut();
-  }
-}
+Object.assign(account, {
+  ready: true,
+  signIn: signInWith,
+  sendLink,
+  confirm: finishEmailLink,
+  signOut: () => signOut(auth)
+});
 
 // Re-rendering the stone would interrupt someone typing, so then only the progress updates
 function refresh() {
@@ -137,8 +116,9 @@ async function startSync(user) {
     if (snap.metadata.hasPendingWrites) return;  // our own write echoing back
     const remote = snap.data() || {};
     if (mergeProgress(remote)) refresh();
-    // On arrival, send up anything done on this device while signed out
-    if (!loaded) push();
+    // On arrival, send up anything done on this device while signed out;
+    // and if this device cleared more recently, its (empty) copy wins
+    if (!loaded || (remote.cleared || 0) < state.cleared) push();
     loaded = true;
   }, e => console.warn('Sync stopped', e));
 }
@@ -163,7 +143,9 @@ document.addEventListener('visibilitychange', () => {
 
 onAuthStateChanged(auth, (user) => {
   stopSync();
-  showAccount(user);
+  // (Signed out, keep any "confirm your email" step from a sign-in link in progress)
+  show({ user: user ? (user.email || user.displayName || 'you') : null, ...(user ? { mode: 'idle', note: '' } : {}) });
+  if (state.mapOpen) renderMap();  // "on every device" in the clear prompt depends on this
   if (user) startSync(user);
 });
 
@@ -175,6 +157,6 @@ if (isSignInWithEmailLink(auth, location.href)) {
     finishEmailLink(email);
   } else {
     if (!state.mapOpen) toggleMap();
-    askEmail('to finish signing in, confirm', finishEmailLink, 'sign in');
+    show({ mode: 'confirm', note: '' });
   }
 }

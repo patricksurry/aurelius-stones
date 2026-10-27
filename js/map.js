@@ -1,4 +1,20 @@
-// The progress map: every passage by book and every stone, linked on hover.
+// The progress map: every passage by book and every stone, linked on hover,
+// with sign-in and "clear progress" at its foot.
+
+// Clearing asks first, in place
+let confirmingClear = false;
+
+function clearHtml(claimedCount) {
+  if (!state.read.size && !claimedCount) return '';
+  if (!confirmingClear) return '<button class="quiet-btn" id="clearAsk">clear progress</button>';
+  const what = [
+    state.read.size ? `${state.read.size} passage${state.read.size === 1 ? '' : 's'} read` : '',
+    claimedCount ? `${claimedCount} stone${claimedCount === 1 ? '' : 's'} claimed` : ''
+  ].filter(Boolean).join(' and ');
+  return `<span class="acct-note">Forget ${what}${account.user ? ', on every device' : ''}?</span>
+    <button class="quiet-btn" id="clearYes">clear</button>
+    <button class="quiet-btn" id="clearNo">keep</button>`;
+}
 
 function renderMap() {
   const mapEl = document.getElementById('map');
@@ -13,9 +29,6 @@ function renderMap() {
       <div class="map-head">
         <span>${state.read.size} of ${VERSES.length} passages read · ${claimedCount} of ${STONES.length} stones claimed</span>
         <span>
-          ${account.note ? `<span class="map-note">${escapeHtml(account.note)}</span>` : ''}
-          ${account.field ? `<input class="map-field" type="email" autocomplete="email" placeholder="${escapeHtml(account.field.placeholder)}">` : ''}
-          ${account.links.map((l, i) => `<button class="quiet-btn" data-account="${i}" title="${escapeHtml(l.title || '')}">${escapeHtml(l.label)}</button>`).join(' ')}
           <button class="quiet-btn" id="mapAbout">about</button>
           <button class="quiet-btn" id="mapClose" title="Close (Esc)">close</button>
         </span>
@@ -42,19 +55,21 @@ function renderMap() {
       </div>
 
       <div class="map-hover" id="mapHover"></div>
+
+      <div class="map-foot">
+        <div class="account" data-place="map"></div>
+        <div class="map-clear">${clearHtml(claimedCount)}</div>
+      </div>
     </div>
   `;
 
   document.getElementById('mapClose').addEventListener('click', toggleMap);
   document.getElementById('mapAbout').addEventListener('click', () => { toggleMap(); showWelcome(); });
-  mapEl.querySelectorAll('[data-account]').forEach(btn => {
-    btn.addEventListener('click', () => account.links[btn.dataset.account].act());
-  });
-  const field = mapEl.querySelector('.map-field');
-  if (field) {
-    field.addEventListener('keydown', (e) => { if (e.key === 'Enter') account.field.submit(field.value.trim()); });
-    field.focus();
-  }
+  renderAccount();
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  on('clearAsk', () => { confirmingClear = true; renderMap(); });
+  on('clearNo', () => { confirmingClear = false; renderMap(); });
+  on('clearYes', () => { confirmingClear = false; clearProgress(); render(); renderMap(); });
 
   // Pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages
   const hover = document.getElementById('mapHover');
@@ -96,5 +111,6 @@ function renderMap() {
 
 function toggleMap() {
   state.mapOpen = !state.mapOpen;
+  confirmingClear = false;
   renderMap();
 }

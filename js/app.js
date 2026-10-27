@@ -212,6 +212,7 @@ function showWelcome() {
   const el = document.getElementById('welcome');
   el.classList.remove('leaving');
   el.hidden = false;
+  renderAccount();
 }
 
 function hideWelcome() {

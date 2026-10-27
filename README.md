@@ -30,7 +30,8 @@ Progress stays in your browser; sign in to keep it across devices.
 | `css/style.css` | All styling |
 | `js/store.js` | The dataset, saved progress and shared helpers (loaded first) |
 | `js/card.js` | The stone card, its study side and the related stones |
-| `js/map.js` | The progress map |
+| `js/map.js` | The progress map, with clear progress at its foot |
+| `js/account.js` | The sign-in line on the map and the welcome page |
 | `js/app.js` | Navigation, earning reads, fading controls, theme, welcome and start-up |
 | `js/sync.js` | Optional sign-in and cross-device progress (Firebase) |
 | `stamp.py` | Versions the page's links to its CSS, JS and data, so browsers don't mix old and new |
