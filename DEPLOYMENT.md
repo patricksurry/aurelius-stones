@@ -37,7 +37,7 @@ If you change `firestore.rules`, paste the new version into Firestore → Rules 
   - for each stone, the latest edit wins (every entry carries a timestamp `t`);
   - "clear progress" records when it happened (`cleared`), and a newer clear wipes everything older on either side, so it reaches every device.
 - Changes are saved about 2 seconds after the last edit, and straight away if the tab is hidden.
-- Not synced, kept per browser in `localStorage`: drafts, your place in the book, theme, and the Greek toggle.
+- Not synced, kept per browser in `localStorage`: your place in the book, theme, the Greek toggle, and whether you've opened the map.
 - One account per email: if someone who first used one provider tries another with the same email, they're asked to use the first, and the new provider is then linked to the same account.
 
 ## Run locally

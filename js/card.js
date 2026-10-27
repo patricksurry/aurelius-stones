@@ -1,4 +1,4 @@
-// The stone card: its passage, neighbours, own-words and notes, the study side,
+// The stone card: its passage, neighbours, headline (yours to claim) and notes, the study side,
 // and the related stones beneath it.
 
 // Top corner: stones you've made your own and passages you've read; opens the map
@@ -9,6 +9,19 @@ function renderProgress() {
   document.getElementById('progressClaimed').style.width = `${(claimedCount / STONES.length) * 100}%`;
   document.getElementById('progressRead').style.width = `${(state.read.size / VERSES.length) * 100}%`;
   document.getElementById('progressBtn').title = 'Your progress: open the map (m)';
+}
+
+// Faint arrows either side of the card: back and on through the book, in Marcus's order
+function renderBookSteps() {
+  const idx = VERSES.findIndex(v => v.id === state.currentVerseRef);
+  [['bookPrev', VERSES[idx - 1], 'Back through the book', '←', CHEVRON_LEFT],
+   ['bookNext', VERSES[idx + 1], 'On through the book', '→', CHEVRON_RIGHT]]
+    .forEach(([id, v, label, key, icon]) => {
+      const btn = document.getElementById(id);
+      if (!btn.innerHTML) btn.innerHTML = icon;
+      btn.disabled = !v;
+      btn.title = v ? `${label}: ${v.id} (${key})` : (id === 'bookPrev' ? 'The start of the book' : 'The end of the book');
+    });
 }
 
 function verseHtml(v) {
@@ -24,6 +37,11 @@ function verseHtml(v) {
 
 const CHEVRON_UP = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10l4.5-4.5 4.5 4.5"/></svg>';
 const CHEVRON_DOWN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6l4.5 4.5 4.5-4.5"/></svg>';
+const CHEVRON_LEFT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg>';
+const CHEVRON_RIGHT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg>';
+// The footer's two lenses: an open book to study, an alpha for the Greek
+const BOOK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.2 5 7.6 4.5 4 4.5v13c3.6 0 6.2.5 8 2 1.8-1.5 4.4-2 8-2v-13c-3.6 0-6.2.5-8 2z"/><path d="M12 6.5v13"/></svg>';
+const ALPHA_ICON = '<span class="glyph" aria-hidden="true">α</span>';
 
 // The passage, with a glimpse of the start of the ones before and after it on this stone
 function passageHtml(stone, activeV, entering) {
@@ -52,13 +70,40 @@ function incipit(v) {
   return words.length > 14 ? words.slice(0, 14).join(' ') + '…' : words.join(' ');
 }
 
+// Under the headline: once a passage is read, an offer to claim the stone in your own words;
+// once you have, a way to revise yours or revert to the suggested summary
+function maximLineHtml(stone, claimed, earned) {
+  if (claimed) {
+    return `<div class="suggested">
+      <button class="quiet-btn" id="editMaxim">revise</button> · ${revertHtml(stone)}
+    </div>`;
+  }
+  return `<div class="suggested" id="ownWordsOffer" ${earned ? '' : 'hidden'}>
+    <button class="quiet-btn" id="editMaxim">claim in your own words</button>
+  </div>`;
+}
+
+function revertHtml(stone) {
+  return `<button class="quiet-btn" id="restoreMaxim">revert</button> to “${escapeHtml(stone.defaultMaxim)}”`;
+}
+
+// Called the moment a passage is read: on a stone not yet yours, the offer arrives
+function offerOwnWords() {
+  const offer = document.getElementById('ownWordsOffer');
+  if (state.flipped || !offer || !offer.hidden) return;
+  offer.hidden = false;
+  offer.classList.add('arriving');
+}
+
 function render() {
   const stone = STONE_BY_ID[state.currentStoneId] || STONES[0];
   const claimed = isClaimed(stone.id);
   const user = state.claimed[stone.id] || {};
-  const hasCustomMaxim = Boolean(user.maxim && user.maxim.trim() && user.maxim.trim() !== stone.defaultMaxim);
+  // Claiming a stone in your own words is offered once you've read a passage on it
+  const earned = stone.verseIds.some(id => state.read.has(id));
 
   renderProgress();
+  renderBookSteps();
 
   const stoneVerses = stone.verseIds.map(id => VERSE_BY_ID[id]).filter(Boolean);
   const activeV = VERSE_BY_ID[state.currentVerseRef];
@@ -69,32 +114,27 @@ function render() {
   if (!state.flipped) {
     surface.innerHTML = `
       <div class="maxim-wrap">
-        <textarea class="maxim" id="maximField" rows="1" spellcheck="false"
-                  aria-label="This stone's summary: rewrite it in your own words">${escapeHtml(getStoneHeadline(stone))}</textarea>
-        <div class="suggested" id="suggestedMaxim" ${hasCustomMaxim ? '' : 'hidden'}>
-          suggested: “${escapeHtml(stone.defaultMaxim)}”<button class="quiet-btn" id="restoreMaxim">use this</button>
-        </div>
+        <h1 class="maxim">${escapeHtml(getStoneHeadline(stone))}</h1>
+        ${maximLineHtml(stone, claimed, earned)}
       </div>
 
       ${passageHtml(stone, activeV, state.verseEntering)}
 
       <div class="divider"></div>
 
-      <textarea id="ownWordsField" class="own-words" rows="1" ${hasCustomMaxim ? 'hidden' : ''}
-                placeholder="In your own words…" title="Press Enter to make this the stone's summary">${escapeHtml(state.drafts[stone.id] || '')}</textarea>
       <textarea id="reflectionField" class="reflection-input" rows="1"
                 placeholder="Notes…">${escapeHtml(user.reflection || '')}</textarea>
 
-      <div class="card-foot chrome">
-        <div class="pager-dots">
-          ${stoneVerses.length > 1 ? stoneVerses.map(v => `
-            <button class="pager-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === activeV.id ? 'current' : ''}"
+      <div class="card-foot">
+        <div class="pager-dots chrome">
+          ${stoneVerses.map(v => `
+            <button class="pager-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === activeV.id ? 'current' : ''}" ${v.id === activeV.id ? 'id="currentDot"' : ''}
                     data-ref="${v.id}" title="${v.id} — ${escapeHtml(incipit(v))}"></button>
-          `).join('') : ''}
+          `).join('')}
         </div>
-        <div class="lens">
-          <button class="quiet-btn greek-label ${prefs.greek ? 'on' : ''}" id="greekToggle" title="Show the Greek (g)">ἑλληνιστί</button>
-          <button class="quiet-btn" onclick="flipStone()" title="Commentary, another translation, the Greek (f)">Study</button>
+        <div class="lens chrome">
+          <button class="quiet-btn lens-icon ${prefs.greek ? 'on' : ''}" id="greekToggle" title="The Greek alongside (g)" aria-label="Show the Greek">${ALPHA_ICON}</button>
+          <button class="quiet-btn lens-icon" onclick="flipStone()" title="Study: another translation, commentary, the people named (f)" aria-label="Study">${BOOK_ICON}</button>
         </div>
       </div>
     `;
@@ -110,73 +150,73 @@ function render() {
 
     document.getElementById('greekToggle').addEventListener('click', toggleGreek);
 
-    const maximField = document.getElementById('maximField');
-    const ownWordsField = document.getElementById('ownWordsField');
     const reflectionField = document.getElementById('reflectionField');
-    autoResize(maximField);
     autoResize(reflectionField);
 
-    const persist = () => {
-      const mVal = maximField.value.trim();
-      const rVal = reflectionField.value.trim();
-      const changedMaxim = Boolean(mVal) && mVal !== stone.defaultMaxim;
-      state.claimed[stone.id] = { maxim: changedMaxim ? mVal : stone.defaultMaxim, reflection: rVal, t: Date.now() };
+    reflectionField.addEventListener('input', () => {
+      autoResize(reflectionField);
+      const c = state.claimed[stone.id] || {};
+      state.claimed[stone.id] = { maxim: c.maxim || stone.defaultMaxim, reflection: reflectionField.value.trim(), t: Date.now() };
       save();
-      document.getElementById('suggestedMaxim').hidden = !changedMaxim;
-      ownWordsField.hidden = changedMaxim;
-      surface.classList.toggle('claimed', isClaimed(stone.id));
-      renderRelated(stone);
-      renderProgress();
+    });
+
+    // A new headline redraws the card, so the stone, the progress line and its neighbours all follow
+    const setMaxim = (words) => {
+      const c = state.claimed[stone.id] || {};
+      const changed = Boolean(words) && words !== stone.defaultMaxim;
+      state.claimed[stone.id] = { maxim: changed ? words : stone.defaultMaxim, reflection: c.reflection || '', t: Date.now() };
+      save();
+      render();
     };
 
-    // The summary is edited in place; the first keystroke replaces a suggested one
-    maximField.addEventListener('focus', () => {
-      if (!isClaimed(stone.id)) maximField.select();
-    });
-    maximField.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); maximField.blur(); }
-    });
-    maximField.addEventListener('input', () => { autoResize(maximField); persist(); });
-    maximField.addEventListener('blur', () => {
-      if (!maximField.value.trim()) { maximField.value = stone.defaultMaxim; autoResize(maximField); persist(); }
-    });
-    document.getElementById('restoreMaxim').addEventListener('click', () => {
-      maximField.value = stone.defaultMaxim;
-      autoResize(maximField);
-      persist();
-    });
-    reflectionField.addEventListener('input', () => { autoResize(reflectionField); persist(); });
+    const restore = document.getElementById('restoreMaxim');
+    if (restore) restore.addEventListener('click', () => setMaxim(stone.defaultMaxim));
 
-    // After studying, write the summary in your own words; Enter puts it at the top.
-    // Until then it's a draft that survives leaving the field or the stone.
-    const saveDraft = () => {
-      const words = ownWordsField.value;
-      if (words.trim()) state.drafts[stone.id] = words;
-      else delete state.drafts[stone.id];
-      store('meditations_drafts_v1', state.drafts);
-    };
-    const commitOwnWords = () => {
-      const words = ownWordsField.value.trim();
-      if (!words || words === stone.defaultMaxim) return;
-      maximField.value = words;
-      ownWordsField.value = '';
-      saveDraft();
-      autoResize(maximField);
-      persist();
-      ownWordsField.blur();
-    };
-    autoResize(ownWordsField);
-    ownWordsField.addEventListener('input', () => { autoResize(ownWordsField); saveDraft(); });
-    ownWordsField.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); commitOwnWords(); }
+    // Claiming or revising: the headline becomes a field, with the suggested summary beneath it.
+    // Enter or leaving the field keeps what you wrote; Esc, or leaving it empty or unchanged, keeps what was there.
+    document.getElementById('editMaxim').addEventListener('click', () => {
+      const wrap = surface.querySelector('.maxim-wrap');
+      wrap.innerHTML = `
+        <textarea class="maxim editing" id="maximField" rows="1" spellcheck="false"
+                  placeholder="In your own words…" aria-label="This stone in your own words">${claimed ? escapeHtml(getStoneHeadline(stone)) : ''}</textarea>
+        <div class="suggested">
+          ${claimed ? revertHtml(stone) : `suggested: “${escapeHtml(stone.defaultMaxim)}”`}
+        </div>`;
+      const field = document.getElementById('maximField');
+      let cancelled = false;
+      autoResize(field);
+      field.focus();
+      field.setSelectionRange(field.value.length, field.value.length);
+      field.addEventListener('input', () => autoResize(field));
+      field.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); field.blur(); }
+        if (e.key === 'Escape') cancelled = true;
+      });
+      field.addEventListener('blur', () => {
+        const words = field.value.trim();
+        if (!cancelled && words && words !== getStoneHeadline(stone)) setMaxim(words);
+        else render();
+      });
+      const use = document.getElementById('restoreMaxim');
+      if (use) {
+        // Keep the field focused until the click lands, so leaving it doesn't redraw the button away
+        use.addEventListener('mousedown', (e) => e.preventDefault());
+        use.addEventListener('click', () => { cancelled = true; setMaxim(stone.defaultMaxim); });
+      }
     });
 
   } else {
-    // UNDERSIDE: study this passage through other sources (see raw/SOURCES.md)
+    // UNDERSIDE: study this passage through other sources (see raw/SOURCES.md).
+    // The Greek isn't repeated here: it sits alongside the English on the card (g).
     const book = bookOf(activeV);
     surface.innerHTML = `
-      <div class="study-ref">${activeV.id}</div>
+      <div class="study-ref">${activeV.id} · ${escapeHtml(stone.discipline)}</div>
       <div class="study-title">“${escapeHtml(getStoneHeadline(stone))}”</div>
+
+      <section class="study-section">
+        <h2 class="study-head">George Long's translation, 1862</h2>
+        <p>${escapeHtml(activeV.long)}</p>
+      </section>
 
       ${activeV.commentary.length ? `
         <section class="study-section">
@@ -198,16 +238,6 @@ function render() {
         </section>
       ` : ''}
 
-      <section class="study-section">
-        <h2 class="study-head">George Long's translation, 1862</h2>
-        <p>${escapeHtml(activeV.long)}</p>
-      </section>
-
-      <section class="study-section">
-        <h2 class="study-head">Greek</h2>
-        <p class="greek">${activeV.greek}</p>
-      </section>
-
       ${book.intro.length ? `
         <section class="study-section">
           <details>
@@ -226,8 +256,10 @@ function render() {
         People: <a href="https://en.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a>.
       </p>
 
-      <div class="card-foot lens chrome">
-        <button class="quiet-btn on" onclick="flipStone()" title="Back to the text (f)">Study</button>
+      <div class="card-foot">
+        <div class="lens chrome">
+          <button class="quiet-btn lens-icon on" onclick="flipStone()" title="Back to the text (f)" aria-label="Back to the text">${BOOK_ICON}</button>
+        </div>
       </div>
     `;
   }

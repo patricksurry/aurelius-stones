@@ -11,9 +11,9 @@ const STONE_BY_ID = Object.fromEntries(STONES.map(s => [s.id, s]));
 const VERSE_BY_ID = Object.fromEntries(VERSES.map(v => [v.id, v]));
 
 // A passage counts as read after dwelling on it at a contemplative pace
-const READ_WPM = 130;
-const READ_MIN_MS = 10000;
-const IDLE_MS = 2500;
+const READ_WPM = 200;
+const READ_MIN_MS = 3000;
+const IDLE_MS = 7000;
 
 
 function load(key, fallback) {
@@ -29,9 +29,23 @@ function store(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
 }
 
+// #IV.3 opens that passage; #headland opens that stone at its first unread passage
+function refFromHash(readSet) {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (VERSE_BY_ID[h]) return h;
+  const stone = STONE_BY_ID[h];
+  if (stone && stone.verseIds.length) {
+    return (readSet && stone.verseIds.find(id => !readSet.has(id))) || stone.verseIds[0];
+  }
+  return null;
+}
+
 // theme: 'system' follows the machine; 'day' or 'night' once you choose
 const prefs = { theme: 'system', greek: false, ...load('meditations_prefs_v1', {}) };
-const startRef = VERSE_BY_ID[load('meditations_pos_v1', 'I.1')] ? load('meditations_pos_v1', 'I.1') : 'I.1';
+const initialRead = new Set(load('meditations_read_v1', []));
+const savedRef = load('meditations_pos_v1', 'I.1');
+const hashRef = refFromHash(initialRead);
+const startRef = hashRef || (VERSE_BY_ID[savedRef] ? savedRef : 'I.1');
 
 let state = {
   currentVerseRef: startRef,
@@ -39,9 +53,7 @@ let state = {
   flipped: false,
   mapOpen: false,
   claimed: load('meditations_full_v1', {}),
-  read: new Set(load('meditations_read_v1', [])),
-  // Unfinished "in your own words" summaries, per stone
-  drafts: load('meditations_drafts_v1', {}),
+  read: initialRead,
   // When progress was last cleared, so a clear reaches your other devices
   cleared: load('meditations_cleared_v1', 0)
 };
@@ -83,11 +95,9 @@ function mergeProgress(remote) {
 function wipeProgress(when) {
   state.claimed = {};
   state.read = new Set();
-  state.drafts = {};
   state.cleared = when;
   store('meditations_full_v1', state.claimed);
   store('meditations_read_v1', []);
-  store('meditations_drafts_v1', state.drafts);
   store('meditations_cleared_v1', when);
 }
 

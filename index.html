@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=d999ca2b1b">
+  <link rel="stylesheet" href="css/style.css?v=f30e349d8d">
 </head>
 <body>
 
@@ -23,7 +23,9 @@
   </header>
 
   <main class="stone-wrapper">
+    <div class="book-rail prev"><button class="book-step chrome" id="bookPrev" aria-label="Back through the book"></button></div>
     <article class="stone" id="stoneSurface"></article>
+    <div class="book-rail next"><button class="book-step chrome" id="bookNext" aria-label="On through the book"></button></div>
   </main>
 
   <section class="related chrome-soft" id="relatedRow"></section>
@@ -41,17 +43,18 @@
       <button class="welcome-begin" id="welcomeBegin">Begin</button>
       <div class="account welcome-account" data-place="welcome"></div>
       <p class="welcome-keys">↑ ↓ within a stone · ← → through the book · <b>f</b> study · <b>m</b> map</p>
+      <p class="welcome-touch">↑ ↓ within a stone · swipe ← → through the book</p>
       <p class="welcome-credit">Translated by A. S. L. Farquharson, 1944.</p>
     </div>
   </div>
 
   <!-- FULL 12-BOOK, 488-VERSE, 48-STONE DATASET -->
   <script src="data/meditations.js?v=ffb4e1ce2d"></script>
-  <script src="js/store.js?v=d981b4d8dd"></script>
-  <script src="js/card.js?v=e8a05fd3b1"></script>
-  <script src="js/map.js?v=1b5075dc88"></script>
+  <script src="js/store.js?v=ff6754e511"></script>
+  <script src="js/card.js?v=1248331e93"></script>
+  <script src="js/map.js?v=a047821413"></script>
   <script src="js/account.js?v=6213916efa"></script>
-  <script src="js/app.js?v=4252170df9"></script>
-  <script type="module" src="js/sync.js?v=553b943418"></script>
+  <script src="js/app.js?v=3c6047b6b7"></script>
+  <script type="module" src="js/sync.js?v=4dd992d5b5"></script>
 </body>
 </html>

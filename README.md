@@ -15,7 +15,7 @@ grouped by the three themes.
 Rather than reading linearly, the app encourages you to reflect on one or more passages
 belonging to a stone and make it your own by rewriting the summary and adding personal notes.
 Each stone also has study notes: A. S. L. Farquharson's commentary,
-George Long's translation, the historical figures Marcus mentions, and the original Greek.
+George Long's translation, and the historical figures Marcus mentions; the original Greek can sit alongside the English.
 A passage counts as read only after you've spent time with it.
 A progress map shows every passage and stone, and how far you've come.
 Progress stays in your browser; sign in to keep it across devices.

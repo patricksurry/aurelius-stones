@@ -63,7 +63,7 @@ async function finishEmailLink(email) {
     show({ mode: 'idle', note: 'That link has expired or was already used; ask for a new one' });
   }
   localStorage.removeItem(EMAIL_KEY);
-  history.replaceState(null, '', location.pathname);
+  history.replaceState(history.state, '', location.pathname + location.hash);
 }
 
 async function afterSignIn(user) {

@@ -5,7 +5,7 @@
   --stone-under-bg: #ebe6da;
   --ink: #1f1d1a;
   --ink-mid: #4d4840;
-  --ink-faint: #857e71;
+  --ink-faint: #736c60;
   --ink-greek: #6f685c;
   --stone-fill-claimed: #9a7b66;
   --stone-border-claimed: #c9b6a7;
@@ -20,7 +20,7 @@
   --stone-under-bg: #181714;
   --ink: #ece7dc;
   --ink-mid: #b3ada1;
-  --ink-faint: #7d786e;
+  --ink-faint: #9a948a;
   --ink-greek: #948e83;
   --stone-fill-claimed: #a6826b;
   --stone-border-claimed: #4a3d34;
@@ -120,7 +120,8 @@ body.idle .chrome:focus-within {
 }
 
 .progress-btn:hover .progress-caption,
-.progress-btn:focus-visible .progress-caption {
+.progress-btn:focus-visible .progress-caption,
+body:not(.map-seen) .progress-caption {
   opacity: 1;
 }
 
@@ -154,6 +155,16 @@ body.idle .chrome:focus-within {
   background: var(--ink-faint);
 }
 
+/* A passage just earned: the reading line glows warm for a moment */
+.progress-read > span.earned {
+  animation: earned-line 2s ease;
+}
+
+@keyframes earned-line {
+  0%, 30% { background: var(--stone-fill-claimed); box-shadow: 0 0 6px var(--stone-fill-claimed); }
+  100% { background: var(--ink-faint); box-shadow: none; }
+}
+
 .progress-btn:hover .progress-line {
   background: var(--ink-faint);
 }
@@ -164,6 +175,63 @@ body.idle .chrome:focus-within {
 .stone-wrapper {
   width: 100%;
   max-width: 780px;
+  position: relative;
+}
+
+/* Back and on through the book, just outside the card. Each arrow rides
+   at the middle of the window, held within the card's height. */
+.book-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.book-rail.prev {
+  left: -3.25rem;
+}
+
+.book-rail.next {
+  right: -3.25rem;
+}
+
+.book-step {
+  position: sticky;
+  top: calc(50vh - 1.75rem);
+  bottom: calc(50vh - 1.75rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 3.5rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+
+.book-step svg {
+  width: 16px;
+  height: 16px;
+}
+
+.book-step:hover {
+  color: var(--ink);
+}
+
+/* Nothing that way: no arrow */
+.book-step:disabled {
+  visibility: hidden;
+}
+
+/* No room beside the card, or touch (swipe instead) */
+@media (max-width: 900px), (hover: none) {
+  .book-rail {
+    display: none;
+  }
 }
 
 .stone {
@@ -191,28 +259,12 @@ body.idle .chrome:focus-within {
 
 /* The maxim: "pencil sketch" when suggested, "carved ink" once in your own words */
 .maxim {
-  display: block;
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid transparent;
-  resize: none;
-  overflow: hidden;
-  outline: none;
-  padding: 0 0 0.15rem;
-  font-family: var(--font);
   font-size: 1.85rem;
   line-height: 1.32;
   font-weight: 400;
   color: var(--ink-mid);
   font-style: italic;
-  cursor: text;
-  transition: color 0.25s ease, border-color 0.25s ease;
-}
-
-.maxim:hover,
-.maxim:focus {
-  border-bottom-color: var(--hairline);
+  transition: color 0.25s ease;
 }
 
 .stone.claimed .maxim {
@@ -220,7 +272,28 @@ body.idle .chrome:focus-within {
   font-style: normal;
 }
 
-/* Below your own summary: the suggested one, to compare or go back to */
+/* Claiming or revising: the headline becomes a field, written upright in ink */
+.maxim.editing {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  resize: none;
+  overflow: hidden;
+  outline: none;
+  padding: 0 0 0.15rem;
+  font-family: var(--font);
+  color: var(--ink);
+  font-style: normal;
+}
+
+.maxim.editing::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* Below the headline: the offer to put it in your own words, or the suggested one to compare and go back to */
 .suggested {
   margin-top: 0.4rem;
   font-size: 0.96rem;
@@ -229,10 +302,23 @@ body.idle .chrome:focus-within {
 }
 
 .suggested .quiet-btn {
-  font-size: 0.9rem;
+  font-size: inherit;
   font-style: italic;
-  margin-left: 0.4rem;
   text-decoration: underline dotted;
+}
+
+.suggested[hidden] {
+  display: none;
+}
+
+/* The offer arrives slowly, the moment it's earned */
+.arriving {
+  animation: arriving 1.6s ease;
+}
+
+@keyframes arriving {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* =====================================================
@@ -293,9 +379,9 @@ body.show-greek .verse {
   color: var(--ink-mid);
 }
 
+/* First or last on the stone: the arrow goes, but keeps its place so the passage doesn't shift */
 .neighbor:disabled {
-  cursor: default;
-  opacity: 0.35;
+  visibility: hidden;
 }
 
 .neighbor svg {
@@ -370,14 +456,24 @@ body.show-greek .verse-greek {
 }
 
 .pager-dot {
+  --dot: color-mix(in srgb, var(--ink-faint) 65%, transparent);
+  position: relative;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  border: 1px solid var(--ink-faint);
+  border: 1px solid var(--dot);
   background: transparent;
   padding: 0;
   cursor: pointer;
   transition: transform 0.18s ease;
+}
+
+.pager-dot::before,
+.map-dot::before,
+.stone-ellipse::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .pager-dot:hover {
@@ -385,13 +481,55 @@ body.show-greek .verse-greek {
 }
 
 .pager-dot.read {
-  background: var(--ink-mid);
-  border-color: var(--ink-mid);
+  background: var(--dot);
 }
 
+/* Registered, so the fill can glide smoothly between the reading timer's ticks */
+@property --dwell {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* The passage you're on: a slightly larger dot whose fill slowly comes in as you read it */
 .pager-dot.current {
-  outline: 1px solid var(--ink);
-  outline-offset: 2px;
+  --dot: var(--ink-faint);
+  width: 10px;
+  height: 10px;
+  transition: transform 0.18s ease, --dwell 0.5s linear;
+}
+
+.pager-dot.current.read {
+  background: transparent;
+}
+
+.pager-dot.current::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--dot);
+  opacity: var(--dwell);
+}
+
+.pager-dot.current.read::after {
+  opacity: 1;
+}
+
+/* Earned: the dot swells, warms and settles */
+.pager-dot.earned {
+  animation: earned-dot 1.4s ease;
+}
+
+@keyframes earned-dot {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.35); border-color: var(--stone-fill-claimed); box-shadow: 0 0 8px var(--stone-fill-claimed); }
+  100% { transform: scale(1); }
+}
+
+/* The moment a passage is earned, the pager dots surface even if the controls have faded */
+body.idle .chrome.revealed {
+  opacity: 1;
 }
 
 /* Quiet small-caps labels, same voice as the book marker */
@@ -410,10 +548,32 @@ body.show-greek .verse-greek {
   color: var(--ink);
 }
 
-.lens .greek-label {
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
+.lens {
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lens .lens-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.lens-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.lens-icon .glyph {
+  font-size: 1.6rem;
+  font-style: italic;
+  line-height: 1;
   text-transform: none;
+  letter-spacing: 0;
+  transform: translateY(-2px);
 }
 
 /* =====================================================
@@ -425,7 +585,6 @@ body.show-greek .verse-greek {
   margin: 2rem 0 1.25rem;
 }
 
-.own-words,
 .reflection-input {
   width: 100%;
   background: transparent;
@@ -439,18 +598,6 @@ body.show-greek .verse-greek {
   color: var(--ink-mid);
 }
 
-.own-words {
-  font-size: 1.35rem;
-  line-height: 1.4;
-  color: var(--ink);
-  margin-bottom: 0.5rem;
-}
-
-.own-words[hidden] {
-  display: none;
-}
-
-.own-words::placeholder,
 .reflection-input::placeholder {
   color: var(--ink-faint);
   font-style: italic;
@@ -561,7 +708,7 @@ body.show-greek .verse-greek {
 }
 
 body.idle .chrome-soft:not(:hover) {
-  opacity: 0.4;
+  opacity: 0.7;
 }
 
 .related {
@@ -624,10 +771,44 @@ body.idle .chrome-soft:not(:hover) {
   max-width: 780px;
 }
 
+.map-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.map-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.map-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* An upright question mark in a thin ring, drawn to the same weight as the × beside it */
+.map-icon .glyph.circled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1.2px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding-top: 1px;
+}
+
 .map-head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   color: var(--ink-mid);
   font-style: italic;
   margin-bottom: 1.25rem;
@@ -716,6 +897,7 @@ body.idle .chrome-soft:not(:hover) {
 }
 
 .map-dot {
+  position: relative;
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -754,6 +936,45 @@ body.idle .chrome-soft:not(:hover) {
   font-size: 1.05rem;
   line-height: 1.45;
   color: var(--ink);
+}
+
+/* With a pointer, the preview floats beside the dot or stone */
+.map-hover.floating {
+  position: fixed;
+  bottom: auto;
+  height: auto;
+  margin: 0;
+  width: max-content;
+  max-width: min(28rem, calc(100vw - 2rem));
+  padding: 0.55rem 0.9rem;
+  background: var(--stone-bg);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 11;
+}
+
+.map-hover.floating.shown {
+  opacity: 1;
+}
+
+.map-hint {
+  margin-top: 1.5rem;
+  padding-bottom: 1rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.map-hint:empty {
+  display: none;
+}
+
+.map-hover[data-go] {
+  cursor: pointer;
 }
 
 .map-hover .text {
@@ -811,11 +1032,30 @@ body.idle .chrome-soft:not(:hover) {
 
 .map-stones {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.map-discipline {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: center;
+}
+
+.map-theme {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.map-pebbles {
+  display: flex;
   flex-wrap: wrap;
   gap: 0.7rem;
 }
 
 .stone-ellipse {
+  position: relative;
   width: 18px;
   height: 12px;
   border-radius: 52% 48% 54% 46% / 48% 54% 46% 52%;
@@ -926,13 +1166,30 @@ body.idle .chrome-soft:not(:hover) {
 }
 
 .welcome-keys,
+.welcome-touch,
 .welcome-credit {
   font-size: 0.9rem;
   color: var(--ink-faint);
 }
 
+.welcome-touch {
+  display: none;
+}
+
 .welcome-keys b {
   font-weight: 500;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .progress-caption {
+    opacity: 0.75;
+  }
+  .welcome-keys {
+    display: none;
+  }
+  .welcome-touch {
+    display: block;
+  }
 }
 
 @media (max-width: 680px) {
