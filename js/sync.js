@@ -2,7 +2,7 @@
 // in Firestore at progress/{uid}, readable only by you (see firestore.rules).
 // Reading needs no account; this module only adds sign-in links to the map.
 // It talks to index.html through progressSnapshot(), mergeProgress(), the
-// 'progress' event and the account object, all defined there.
+// 'progress' event and the account object, defined in store.js.
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {

@@ -8,11 +8,13 @@ The app is static files served by GitHub Pages. Optional sign-in and cross-devic
 
 Push to `main`. GitHub Pages serves the repo root as is (`.nojekyll` turns off Jekyll) and is live a minute or so later.
 
-After changing anything that feeds the dataset, run `python3 build_data.py` before pushing. It rewrites `data/meditations.js` and stamps its hash into `index.html`, so browsers don't mix old data with new code.
+Before pushing:
+- after changing CSS or JS, run `python3 stamp.py`. It puts a hash of each file's contents into its link in `index.html`, so browsers don't mix a new page with stale cached files.
+- after changing anything that feeds the dataset, run `python3 build_data.py`. It rewrites `data/meditations.js`, then stamps everything the same way.
 
 ## Firebase setup
 
-All of this is in the [Firebase console](https://console.firebase.google.com/project/aurelius-stones), on the free Spark plan with no billing. The web app's config, which is public by design, is in `sync.js`.
+All of this is in the [Firebase console](https://console.firebase.google.com/project/aurelius-stones), on the free Spark plan with no billing. The web app's config, which is public by design, is in `js/sync.js`.
 
 | What | Where | Setting |
 |---|---|---|
@@ -27,7 +29,7 @@ If you change `firestore.rules`, paste the new version into Firestore → Rules 
 
 ## How sync works
 
-`sync.js` loads Firebase from Google's CDN and works with `index.html` through `progressSnapshot()`, `mergeProgress()`, a `progress` event and the `account` object.
+`js/sync.js` loads Firebase from Google's CDN and works with the rest of the app (`js/store.js`) through `progressSnapshot()`, `mergeProgress()`, a `progress` event and the `account` object.
 
 - Each signed-in user has one document in Firestore, `progress/{uid}`: `{claimed, read, updated}`.
 - When you sign in, the browser's own progress is merged with the saved copy:

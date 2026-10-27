@@ -6,13 +6,16 @@ from clustering/, and for each passage George Long's translation and
 Farquharson's commentary. Sources are listed in raw/SOURCES.md.
 """
 
-import hashlib
 import html
 import json
+import os
 import re
 import xml.etree.ElementTree as ET
 
 from sources import load_commentary, load_long
+from stamp import stamp
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 ROMAN = {
     1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI",
@@ -27,12 +30,12 @@ BOOK_HEADINGS = {
 
 # Stones (thematic groupings) and their relatedness come from clustering/;
 # see clustering/PROCESS.md for how they were made.
-CLUSTERING_DIR = "/Users/psurry/meditations/clustering"
-RAW_DIR = "/Users/psurry/meditations/raw"
+CLUSTERING_DIR = os.path.join(ROOT, "clustering")
+RAW_DIR = os.path.join(ROOT, "raw")
 
 
 def load_aligned_verses():
-    tree = ET.parse("/Users/psurry/meditations/raw/greek.xml")
+    tree = ET.parse(os.path.join(ROOT, "raw/greek.xml"))
     root = tree.getroot()
     ns = {"tei": "http://www.tei-c.org/ns/1.0"}
     g_books = root.findall(".//tei:div[@subtype='book']", ns)
@@ -54,7 +57,7 @@ def load_aligned_verses():
             else:
                 g_chaps[n] = txt
 
-        with open(f"/Users/psurry/meditations/raw/farquharson_book_{b}.html") as f:
+        with open(os.path.join(ROOT, f"raw/farquharson_book_{b}.html")) as f:
             s = f.read()
         s = re.sub(r"<style.*?</style>", "", s, flags=re.S)
         # MediaWiki data-mw attributes hold JSON with literal "/>", which breaks naive tag stripping
@@ -145,7 +148,7 @@ def attach_sources(verses):
 
 def link_people(verses):
     """Mark historical people in each passage and list them (people/people.json, raw/wikipedia/people.json)."""
-    with open("/Users/psurry/meditations/people/people.json", encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "people/people.json"), encoding="utf-8") as f:
         spec = json.load(f)["people"]
     with open(f"{RAW_DIR}/wikipedia/people.json", encoding="utf-8") as f:
         wiki = json.load(f)["people"]
@@ -230,22 +233,16 @@ def main():
         "verses": verses
     }
 
-    with open("/Users/psurry/meditations/data/meditations.json", "w", encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "data/meditations.json"), "w", encoding="utf-8") as f:
         json.dump(dataset, f, ensure_ascii=False, indent=2)
 
-    with open("/Users/psurry/meditations/data/meditations.js", "w", encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "data/meditations.js"), "w", encoding="utf-8") as f:
         f.write("window.MEDITATIONS_DATA = ")
         json.dump(dataset, f, ensure_ascii=False)
         f.write(";\n")
 
     # Version the data file's URL by its content, so browsers never pair new code with a stale cached copy
-    with open("/Users/psurry/meditations/data/meditations.js", "rb") as f:
-        version = hashlib.sha1(f.read()).hexdigest()[:10]
-    with open("/Users/psurry/meditations/index.html", encoding="utf-8") as f:
-        page = f.read()
-    page = re.sub(r'src="data/meditations\.js(\?v=[0-9a-f]+)?"', f'src="data/meditations.js?v={version}"', page)
-    with open("/Users/psurry/meditations/index.html", "w", encoding="utf-8") as f:
-        f.write(page)
+    stamp()  # version index.html's links to the data, CSS and JS
 
     print(f"Built dataset: {len(books_out)} books, {len(verses)} verses, {len(stones_out)} stones.")
     for s in stones_out[:10]:

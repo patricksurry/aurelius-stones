@@ -12,10 +12,11 @@ load_commentary():  A. S. L. Farquharson's 1944 commentary, per book:
 
 import html
 import json
+import os
 import re
 
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]
-RAW = "/Users/psurry/meditations/raw"
+RAW = os.path.join(os.path.dirname(os.path.abspath(__file__)), "raw")
 PATH = f"{RAW}/gutenberg/long_pg15877.txt"
 
 

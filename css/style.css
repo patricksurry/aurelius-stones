@@ -1,0 +1,899 @@
+:root {
+  --bg: #f3f0e8;
+  --stone-bg: #faf8f3;
+  --stone-claimed-bg: #fdfcf9;
+  --stone-under-bg: #ebe6da;
+  --ink: #1f1d1a;
+  --ink-mid: #4d4840;
+  --ink-faint: #857e71;
+  --ink-greek: #6f685c;
+  --stone-fill-claimed: #9a7b66;
+  --stone-border-claimed: #c9b6a7;
+  --hairline: #e4dfd3;
+  --font: 'EB Garamond', Georgia, serif;
+}
+
+[data-theme="night"] {
+  --bg: #141311;
+  --stone-bg: #1c1b18;
+  --stone-claimed-bg: #211f1b;
+  --stone-under-bg: #181714;
+  --ink: #ece7dc;
+  --ink-mid: #b3ada1;
+  --ink-faint: #7d786e;
+  --ink-greek: #948e83;
+  --stone-fill-claimed: #a6826b;
+  --stone-border-claimed: #4a3d34;
+  --hairline: #2b2924;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.75rem 1.5rem 5rem;
+  transition: background 0.4s ease, color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: var(--font);
+}
+
+/* =====================================================
+   CHROME: CONTROLS FADE AWAY WHEN THE MOUSE IS STILL
+   ===================================================== */
+.chrome {
+  transition: opacity 0.9s ease;
+}
+
+body.idle .chrome {
+  opacity: 0;
+}
+
+body.idle .chrome:hover,
+body.idle .chrome:focus-within {
+  opacity: 1;
+}
+
+.quiet-btn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.quiet-btn:hover {
+  color: var(--ink);
+}
+
+/* =====================================================
+   TOP CORNER: QUIET PROGRESS (OPENS THE MAP) & THEME
+   ===================================================== */
+.horizon {
+  width: 100%;
+  max-width: 780px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.theme-btn {
+  display: inline-flex;
+  padding: 0.35rem;
+}
+
+.theme-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Two hairlines: stones claimed (warm) over passages read; opens the map */
+.progress-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-caption {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.progress-btn:hover .progress-caption,
+.progress-btn:focus-visible .progress-caption {
+  opacity: 1;
+}
+
+.progress-track {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 11rem;
+}
+
+.progress-line {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink-faint) 30%, transparent);
+  overflow: hidden;
+}
+
+.progress-line > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 1.2s ease;
+}
+
+.progress-claimed > span {
+  background: var(--stone-fill-claimed);
+}
+
+.progress-read > span {
+  background: var(--ink-faint);
+}
+
+.progress-btn:hover .progress-line {
+  background: var(--ink-faint);
+}
+
+/* =====================================================
+   THE MAIN STONE
+   ===================================================== */
+.stone-wrapper {
+  width: 100%;
+  max-width: 780px;
+}
+
+.stone {
+  background: var(--stone-bg);
+  border: 1px solid var(--hairline);
+  border-radius: 26px 30px 24px 28px;
+  padding: 2.75rem 3.25rem 1.5rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.035);
+  transition: background 0.35s ease, border-color 0.35s ease, opacity 0.22s ease;
+  position: relative;
+}
+
+.stone.fading {
+  opacity: 0;
+}
+
+.stone.claimed {
+  background: var(--stone-claimed-bg);
+  border-color: var(--stone-border-claimed);
+}
+
+.stone.underside {
+  background: var(--stone-under-bg);
+}
+
+/* The maxim: "pencil sketch" when suggested, "carved ink" once in your own words */
+.maxim {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  resize: none;
+  overflow: hidden;
+  outline: none;
+  padding: 0 0 0.15rem;
+  font-family: var(--font);
+  font-size: 1.85rem;
+  line-height: 1.32;
+  font-weight: 400;
+  color: var(--ink-mid);
+  font-style: italic;
+  cursor: text;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.maxim:hover,
+.maxim:focus {
+  border-bottom-color: var(--hairline);
+}
+
+.stone.claimed .maxim {
+  color: var(--ink);
+  font-style: normal;
+}
+
+/* Below your own summary: the suggested one, to compare or go back to */
+.suggested {
+  margin-top: 0.4rem;
+  font-size: 0.96rem;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.suggested .quiet-btn {
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-left: 0.4rem;
+  text-decoration: underline dotted;
+}
+
+/* =====================================================
+   THE TEXT
+   ===================================================== */
+.verse {
+  margin-top: 1.25rem;
+  transition: opacity 0.22s ease;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: baseline;
+}
+
+body.show-greek .verse {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* The passage with a glimpse of its neighbours on the stone, like a column read in a scroll */
+.passage {
+  margin-top: 1.25rem;
+  transition: opacity 0.22s ease;
+}
+
+.passage.fading {
+  opacity: 0;
+}
+
+.passage .verse {
+  margin-top: 0;
+}
+
+.neighbor {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.35rem 0;
+  text-align: left;
+  font-family: var(--font);
+  font-size: 1.05rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.9s ease;
+}
+
+.neighbor.prev {
+  margin-bottom: 0.6rem;
+}
+
+.neighbor.next {
+  margin-top: 0.6rem;
+}
+
+.neighbor:hover:not(:disabled) {
+  color: var(--ink-mid);
+}
+
+.neighbor:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.neighbor svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  align-self: center;
+}
+
+.neighbor-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.verse-english {
+  font-size: 1.22rem;
+  line-height: 1.66;
+  color: var(--ink);
+  max-width: 38em;
+}
+
+.verse-greek {
+  display: none;
+  font-size: 1.22rem;
+  line-height: 1.66;
+  color: var(--ink-greek);
+}
+
+body.show-greek .verse-greek {
+  display: block;
+}
+
+.verse-ref {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin-right: 0.55rem;
+  font-variant-numeric: tabular-nums;
+  transition: color 1.2s ease;
+}
+
+#activeRef {
+  cursor: pointer;
+}
+
+/* Historical people: a faint dotted line; click for the study side */
+.verse .person {
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink-faint) 70%, transparent);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.verse .person:hover {
+  border-bottom-color: var(--ink);
+}
+
+/* Ref inks in once the passage has been read */
+.verse-ref.read {
+  color: var(--ink);
+}
+
+/* =====================================================
+   STONE PAGER: ALL THE PASSAGES ON THIS STONE (CARD FOOTER)
+   ===================================================== */
+.pager-dots {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pager-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.pager-dot:hover {
+  transform: scale(1.5);
+}
+
+.pager-dot.read {
+  background: var(--ink-mid);
+  border-color: var(--ink-mid);
+}
+
+.pager-dot.current {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Quiet small-caps labels, same voice as the book marker */
+.lens {
+  display: flex;
+  gap: 1rem;
+}
+
+.lens .quiet-btn {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lens .quiet-btn.on {
+  color: var(--ink);
+}
+
+.lens .greek-label {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* =====================================================
+   YOUR NOTES (AT THE END: READ FIRST, THEN WRITE)
+   ===================================================== */
+.divider {
+  height: 1px;
+  background: var(--hairline);
+  margin: 2rem 0 1.25rem;
+}
+
+.own-words,
+.reflection-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: var(--font);
+  resize: none;
+  overflow: hidden;
+  outline: none;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.own-words {
+  font-size: 1.35rem;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.own-words[hidden] {
+  display: none;
+}
+
+.own-words::placeholder,
+.reflection-input::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.card-foot .lens {
+  margin-left: auto;
+}
+
+/* =====================================================
+   UNDERSIDE: STUDYING THE PASSAGE (COMMENTARY, LONG, GREEK)
+   ===================================================== */
+.study-ref {
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-bottom: 0.35rem;
+}
+
+.study-title {
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-mid);
+  margin-bottom: 1.75rem;
+}
+
+.study-section {
+  margin-bottom: 2rem;
+}
+
+.study-head {
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.6rem;
+}
+
+.study-section p {
+  font-size: 1.1rem;
+  line-height: 1.62;
+  color: var(--ink);
+  max-width: 38em;
+  margin-bottom: 0.75rem;
+}
+
+.study-label {
+  color: var(--ink-faint);
+  margin-right: 0.4rem;
+}
+
+.study-section .greek {
+  color: var(--ink-mid);
+}
+
+.study-section details summary {
+  cursor: pointer;
+  color: var(--ink-mid);
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+.person-entry {
+  border-radius: 6px;
+  transition: background 1.5s ease;
+}
+
+.person-entry.focused {
+  background: color-mix(in srgb, var(--stone-fill-claimed) 14%, transparent);
+}
+
+.person-entry a {
+  color: var(--ink);
+}
+
+.person-desc {
+  color: var(--ink-mid);
+  font-style: italic;
+}
+
+.study-sources {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--hairline);
+  padding-top: 1rem;
+}
+
+.study-sources a {
+  color: inherit;
+}
+
+/* =====================================================
+   BELOW THE STONE: RELATED STONES, RESTING QUIETLY NEARBY
+   ===================================================== */
+.chrome-soft {
+  transition: opacity 0.9s ease;
+}
+
+body.idle .chrome-soft:not(:hover) {
+  opacity: 0.4;
+}
+
+.related {
+  width: 100%;
+  max-width: 780px;
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.mini-stone {
+  min-width: 0;
+  background: var(--stone-bg);
+  border: 1px solid var(--hairline);
+  border-radius: 16px 19px 15px 18px;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  text-align: left;
+  font-size: 1.08rem;
+  line-height: 1.38;
+  color: var(--ink-mid);
+  font-style: italic;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.02);
+}
+
+.mini-stone:hover {
+  transform: translateY(-2px);
+  border-color: var(--ink-faint);
+}
+
+.mini-stone.claimed {
+  background: var(--stone-claimed-bg);
+  border-color: var(--stone-border-claimed);
+  color: var(--ink);
+  font-style: normal;
+}
+
+/* =====================================================
+   THE MAP: READING PROGRESS & CLAIMED STONES, ON REQUEST
+   ===================================================== */
+.map {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 2rem 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.map[hidden] {
+  display: none;
+}
+
+.map-inner {
+  width: 100%;
+  max-width: 780px;
+}
+
+.map-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: var(--ink-mid);
+  font-style: italic;
+  margin-bottom: 1.25rem;
+}
+
+.map-note {
+  color: var(--ink-faint);
+  margin-right: 0.5rem;
+}
+
+.map-field {
+  font: inherit;
+  font-style: normal;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--ink-faint);
+  outline: none;
+  width: 14rem;
+  max-width: 50vw;
+  margin-right: 0.5rem;
+}
+
+.map-book {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr;
+  align-items: baseline;
+  margin-bottom: 0.7rem;
+}
+
+.map-numeral {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+}
+
+.map-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.map-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.map-dot:hover {
+  transform: scale(1.6);
+}
+
+.map-dot.read {
+  background: var(--ink-mid);
+  border-color: var(--ink-mid);
+}
+
+.map-dot.current {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* What you're pointing at: a passage's opening, or a stone's maxim */
+/* Sits just under the stones; sticks to the window's bottom edge only when the map is taller than the window */
+.map-hover {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  height: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  margin-top: 1.25rem;
+  padding: 0.6rem 0 env(safe-area-inset-bottom, 0px);
+  background: var(--bg);
+  overflow: hidden;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.map-hover .text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-hover .hint,
+.map-hover .ref {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.map-hover .ref {
+  font-style: normal;
+  margin-right: 0.5rem;
+}
+
+.map-hover .on-stone {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--ink-mid);
+}
+
+/* Linked highlights between passages and their stone */
+.map-dot.lit,
+.stone-ellipse.lit {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 1px var(--stone-fill-claimed);
+}
+
+.map-dots.dim .map-dot:not(.lit),
+.map-stones.dim .stone-ellipse:not(.lit) {
+  opacity: 0.35;
+}
+
+.map-dot,
+.stone-ellipse {
+  transition: transform 0.18s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-section {
+  margin: 1.75rem 0 0.8rem;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+
+.map-stones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.stone-ellipse {
+  width: 18px;
+  height: 12px;
+  border-radius: 52% 48% 54% 46% / 48% 54% 46% 52%;
+  border: 1.25px solid var(--ink-faint);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.stone-ellipse:hover {
+  transform: scale(1.25);
+}
+
+.stone-ellipse.claimed {
+  background: var(--stone-fill-claimed);
+  border-color: var(--stone-fill-claimed);
+}
+
+.stone-ellipse.current {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* =====================================================
+   WELCOME: SHOWN ONCE, THEN FROM "ABOUT" ON THE MAP
+   ===================================================== */
+.welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  overflow-y: auto;
+  transition: opacity 0.6s ease;
+}
+
+.welcome[hidden] {
+  display: none;
+}
+
+.welcome.leaving {
+  opacity: 0;
+}
+
+.welcome-inner {
+  max-width: 32rem;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--ink-mid);
+}
+
+.welcome-inner p {
+  margin-bottom: 1rem;
+}
+
+.welcome-title {
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.welcome-greek {
+  color: var(--ink-faint);
+  font-size: 1.05rem;
+  margin: 0.35rem 0 2rem !important;
+}
+
+.welcome-greek span {
+  font-style: italic;
+}
+
+.welcome-inner em {
+  color: var(--ink);
+}
+
+.welcome-begin {
+  margin: 1.25rem 0 2rem;
+  padding: 0.55rem 1.6rem;
+  background: none;
+  border: 1px solid var(--ink-faint);
+  border-radius: 999px;
+  font-family: var(--font);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.welcome-begin:focus-visible {
+  outline: 1px solid var(--ink-faint);
+  outline-offset: 3px;
+}
+
+.welcome-begin:hover {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.welcome-keys,
+.welcome-credit {
+  font-size: 0.9rem;
+  color: var(--ink-faint);
+}
+
+.welcome-keys b {
+  font-weight: 500;
+}
+
+@media (max-width: 680px) {
+  .stone {
+    padding: 1.75rem 1.5rem 1.25rem;
+  }
+  body.show-greek .verse {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+  .related {
+    grid-template-columns: 1fr;
+  }
+}
