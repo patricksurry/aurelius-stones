@@ -643,6 +643,11 @@
       margin-bottom: 1.25rem;
     }
 
+    .map-note {
+      color: var(--ink-faint);
+      margin-right: 0.5rem;
+    }
+
     .map-book {
       display: grid;
       grid-template-columns: 2.75rem 1fr;
@@ -1000,8 +1005,9 @@
       return changed;
     }
 
-    // Filled in by sync.js when sign-in is available: the map shows a sign in / out link
-    const account = { label: '', title: '', toggle: null };
+    // Filled in by sync.js when sign-in is available: the map shows its links
+    // (sign in, then a choice of provider, or sign out) and any short note
+    const account = { links: [], note: '' };
 
     function isClaimed(stoneId) {
       const stone = STONE_BY_ID[stoneId];
@@ -1299,7 +1305,8 @@
           <div class="map-head">
             <span>${state.read.size} of ${VERSES.length} passages read · ${claimedCount} of ${STONES.length} stones claimed</span>
             <span>
-              ${account.toggle ? `<button class="quiet-btn" id="mapAccount" title="${escapeHtml(account.title)}">${escapeHtml(account.label)}</button>` : ''}
+              ${account.note ? `<span class="map-note">${escapeHtml(account.note)}</span>` : ''}
+              ${account.links.map((l, i) => `<button class="quiet-btn" data-account="${i}" title="${escapeHtml(l.title || '')}">${escapeHtml(l.label)}</button>`).join(' ')}
               <button class="quiet-btn" id="mapAbout">about</button>
               <button class="quiet-btn" id="mapClose" title="Close (Esc)">close</button>
             </span>
@@ -1331,7 +1338,9 @@
 
       document.getElementById('mapClose').addEventListener('click', toggleMap);
       document.getElementById('mapAbout').addEventListener('click', () => { toggleMap(); showWelcome(); });
-      if (account.toggle) document.getElementById('mapAccount').addEventListener('click', account.toggle);
+      mapEl.querySelectorAll('[data-account]').forEach(btn => {
+        btn.addEventListener('click', () => account.links[btn.dataset.account].act());
+      });
 
       // Pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages
       const hover = document.getElementById('mapHover');

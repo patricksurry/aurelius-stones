@@ -1,12 +1,13 @@
-// Optional cross-device sync: sign in with Google, and your progress is kept
+// Optional cross-device sync: sign in with Google or GitHub, and your progress is kept
 // in Firestore at progress/{uid}, readable only by you (see firestore.rules).
-// Reading needs no account; this module only adds a "sign in" link to the map.
+// Reading needs no account; this module only adds sign-in links to the map.
 // It talks to index.html through progressSnapshot(), mergeProgress(), the
 // 'progress' event and the account object, all defined there.
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {
-  getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider
+  getAuth, onAuthStateChanged, signInWithPopup, signOut, linkWithCredential,
+  GoogleAuthProvider, GithubAuthProvider
 } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 
 // Public by design: access is controlled by the Firestore rules, not this key
@@ -25,17 +26,58 @@ let stopListening = null;
 let pushTimer = null;
 let push = null;
 
+const PROVIDERS = [
+  { label: 'Google', make: () => new GoogleAuthProvider(), cls: GoogleAuthProvider },
+  { label: 'GitHub', make: () => new GithubAuthProvider(), cls: GithubAuthProvider }
+];
+
+// One account per email: signing in with GitHub after first using Google (same email)
+// is refused, so we keep that GitHub credential and link it after the original sign-in.
+let pendingLink = null;
+
+function showLinks(links, note = '') {
+  account.links = links;
+  account.note = note;
+  if (state.mapOpen) renderMap();
+}
+
+function showSignedOut(note) {
+  showLinks([{ label: 'sign in', title: 'Keep your progress across devices', act: showChoice }], note);
+}
+
+function showChoice(note = 'sign in with') {
+  showLinks(PROVIDERS.map(p => ({ label: p.label, act: () => signInWith(p) })), note);
+}
+
+async function signInWith(p) {
+  try {
+    const { user } = await signInWithPopup(auth, p.make());
+    if (pendingLink) {
+      await linkWithCredential(user, pendingLink).catch(e => console.warn('Linking failed', e));
+      pendingLink = null;
+    }
+  } catch (e) {
+    if (e.code === 'auth/account-exists-with-different-credential') {
+      pendingLink = p.cls.credentialFromError(e);
+      const others = PROVIDERS.filter(o => o !== p).map(o => o.label).join(' or ');
+      showChoice(`You've signed in with ${others} before; use that once, and ${p.label} will work too`);
+    } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+      console.warn('Sign-in failed', e);
+      showSignedOut('Sign-in didn’t work');
+    }
+  }
+}
+
 function showAccount(user) {
   if (user) {
-    account.label = 'sign out';
-    account.title = `Signed in as ${user.email}; your progress is kept across devices`;
-    account.toggle = () => signOut(auth);
+    showLinks([{
+      label: 'sign out',
+      title: `Signed in as ${user.email || user.displayName}; your progress is kept across devices`,
+      act: () => signOut(auth)
+    }]);
   } else {
-    account.label = 'sign in';
-    account.title = 'Sign in with Google to keep your progress across devices';
-    account.toggle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => console.warn('Sign-in failed', e));
+    showSignedOut();
   }
-  if (state.mapOpen) renderMap();
 }
 
 // Re-rendering the stone would interrupt someone typing, so then only the progress updates
