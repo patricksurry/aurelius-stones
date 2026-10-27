@@ -1,12 +1,24 @@
 # Meditations
 
-A quiet way to read Marcus Aurelius's *Meditations*, one passage at a time.
+A quiet way to reflect on Marcus Aurelius's *Meditations*.
 
-**Read it:** <https://patricksurry.github.io/aurelius-stones/>
+Try it: https://patricksurry.github.io/aurelius-stones/
 
-The 488 passages are gathered on 48 *stones*: the thoughts Marcus kept returning to. The stones are grouped by Pierre Hadot's three disciplines: how to see, what to accept, and how to act. You read a passage slowly and move through its stone. When something lands, you rewrite the stone's summary in your own words, and the stone is yours. A passage counts as read only after you've spent time on it.
+*Meditations* is more a personal journal than a book, 
+and was probably not intended to be read by others, let alone read start to finish.
+It was likely written more as a spiritual exercise where Marcus keeps considering and rewriting
+the same set of core convictions in different words and from different perspectives.
+Marcus named three key themes: how to judge, what to desire, and how to act.
+This app gathers the 488 passages of *Meditations* onto 48 *touchstones*, themselves 
+grouped by the three themes.
 
-The study side of each card has A. S. L. Farquharson's commentary, George Long's translation, the Greek, and the historical people Marcus names. A map shows every passage and stone, and how far you've come. Progress stays in your browser; you can sign in with Google, GitHub or an emailed link to keep it across devices.
+Rather than reading linearly, the app encourages you to reflect on one or more passages
+belonging to a stone and make it your own by rewriting the summary and adding personal notes.
+Each stone also has study notes: A. S. L. Farquharson's commentary,
+George Long's translation, the historical figures Marcus mentions, and the original Greek.
+A passage counts as read only after you've spent time with it.
+A progress map shows every passage and stone, and how far you've come.
+Progress stays in your browser; sign in to keep it across devices.
 
 **Keys:** ↑ ↓ passages on a stone · ← → through the book · `f` study · `g` Greek · `m` map
 
