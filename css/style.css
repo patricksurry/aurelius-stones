@@ -178,8 +178,7 @@ body:not(.map-seen) .progress-caption {
   position: relative;
 }
 
-/* Back and on through the book, just outside the card. Each arrow rides
-   at the middle of the window, held within the card's height. */
+/* Back and on through the book, just outside the card, level with its middle */
 .book-rail {
   position: absolute;
   top: 0;
@@ -198,9 +197,6 @@ body:not(.map-seen) .progress-caption {
 }
 
 .book-step {
-  position: sticky;
-  top: calc(50vh - 1.75rem);
-  bottom: calc(50vh - 1.75rem);
   display: flex;
   align-items: center;
   justify-content: center;
