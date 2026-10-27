@@ -9,7 +9,7 @@ and was probably not intended to be read by others, let alone read start to fini
 It was likely written more as a spiritual exercise where Marcus keeps considering and rewriting
 the same set of core convictions in different words and from different perspectives.
 Marcus named three key themes: how to judge, what to desire, and how to act.
-This app gathers the 488 passages of *Meditations* onto 48 *touchstones*, themselves 
+This app gathers the 488 passages of *Meditations* onto 48 *touchstones* (stones, for short), themselves 
 grouped by the three themes.
 
 Rather than reading linearly, the app encourages you to reflect on one or more passages
