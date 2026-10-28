@@ -61,7 +61,7 @@ function renderMap() {
             <span class="map-theme" title="${d.hint}">${d.id}</span>
             <div class="map-pebbles">
               ${STONES.filter(s => s.discipline === d.id).map(s => `
-                <button class="stone-ellipse ${isClaimed(s.id) ? 'claimed' : ''} ${s.id === state.currentStoneId ? 'current' : ''}"
+                <button class="stone-ellipse ${isClaimed(s.id) ? 'claimed' : ''} ${s.id === state.currentStoneId ? 'current' : ''} ${s.id === todayStone().id ? 'today' : ''}"
                         data-stone-id="${s.id}" aria-label="${escapeHtml(getStoneHeadline(s))}"></button>
               `).join('')}
             </div>
@@ -131,7 +131,7 @@ function renderMap() {
     const goHint = touchOnly ? ' · tap again to open' : '';
     hover.innerHTML = ref
       ? `<span class="text"><span class="ref">${ref}</span>${escapeHtml(incipit(VERSE_BY_ID[ref]))}</span><span class="on-stone">${escapeHtml(getStoneHeadline(stone))}${goHint}</span>`
-      : `<span class="text">${escapeHtml(getStoneHeadline(stone))}</span><span class="on-stone">${stone.discipline} · ${stone.verseIds.length} passages${goHint}</span>`;
+      : `<span class="text">${escapeHtml(getStoneHeadline(stone))}</span><span class="on-stone">${stone.id === todayStone().id ? "today's stone · " : ''}${stone.discipline} · ${stone.verseIds.length} passages${goHint}</span>`;
     if (!touchOnly && el) place(el);
   };
   const onPoint = (e) => {

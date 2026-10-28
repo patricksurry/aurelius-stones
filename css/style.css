@@ -737,6 +737,17 @@ body.idle .chrome-soft:not(:hover) {
   border-color: var(--ink-faint);
 }
 
+/* Today's stone, offered first until you've visited it */
+.mini-tag {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.75rem;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--stone-fill-claimed);
+}
+
 .mini-stone.claimed {
   background: var(--stone-claimed-bg);
   border-color: var(--stone-border-claimed);
@@ -1076,6 +1087,19 @@ body.idle .chrome-soft:not(:hover) {
   outline-offset: 2px;
 }
 
+/* Today's stone: a small warm mark beneath it */
+.stone-ellipse.today::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  border-radius: 50%;
+  background: var(--stone-fill-claimed);
+}
+
 /* =====================================================
    WELCOME: SHOWN ONCE, THEN FROM "ABOUT" ON THE MAP
    ===================================================== */
@@ -1118,10 +1142,16 @@ body.idle .chrome-soft:not(:hover) {
   line-height: 1.1;
 }
 
+.welcome-author {
+  color: var(--ink-mid);
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0 !important;
+}
+
 .welcome-greek {
   color: var(--ink-faint);
   font-size: 1.05rem;
-  margin: 0.35rem 0 2rem !important;
+  margin: 0.15rem 0 2rem !important;
 }
 
 .welcome-greek span {
@@ -1161,30 +1191,14 @@ body.idle .chrome-soft:not(:hover) {
   font-size: 0.95rem;
 }
 
-.welcome-keys,
-.welcome-touch,
 .welcome-credit {
   font-size: 0.9rem;
   color: var(--ink-faint);
 }
 
-.welcome-touch {
-  display: none;
-}
-
-.welcome-keys b {
-  font-weight: 500;
-}
-
 @media (hover: none) and (pointer: coarse) {
   .progress-caption {
     opacity: 0.75;
-  }
-  .welcome-keys {
-    display: none;
-  }
-  .welcome-touch {
-    display: block;
   }
 }
 

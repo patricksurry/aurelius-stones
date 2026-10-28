@@ -104,6 +104,7 @@ function render() {
 
   renderProgress();
   renderBookSteps();
+  if (stone.id === todayStone().id) store('meditations_today_v1', dayKey());
 
   const stoneVerses = stone.verseIds.map(id => VERSE_BY_ID[id]).filter(Boolean);
   const activeV = VERSE_BY_ID[state.currentVerseRef];
@@ -267,24 +268,30 @@ function render() {
   renderRelated(stone);
 }
 
-// Three nearest stones by affinity, preferring ones you haven't yet made your own
+// Three nearest stones by affinity, preferring ones you haven't yet made your own.
+// Until you've visited today's stone, it takes the first place.
 function relatedPicks(currentStone) {
+  const today = todayStone();
+  const offerToday = today.id !== currentStone.id && !todaySeen();
   const nearest = (currentStone.affinity || [])
     .map(id => STONE_BY_ID[id])
-    .filter(s => s && s.id !== currentStone.id)
+    .filter(s => s && s.id !== currentStone.id && !(offerToday && s.id === today.id))
     .slice(0, 6);
-  return [
+  const picks = [
     ...nearest.filter(s => !isClaimed(s.id)),
     ...nearest.filter(s => isClaimed(s.id))
-  ].slice(0, 3);
+  ];
+  return offerToday ? [today, ...picks.slice(0, 2)] : picks.slice(0, 3);
 }
 
 function renderRelated(currentStone) {
   const row = document.getElementById('relatedRow');
   const picks = relatedPicks(currentStone);
 
+  const today = todayStone();
   row.innerHTML = picks.map(s => `
     <button class="mini-stone ${isClaimed(s.id) ? 'claimed' : ''}" data-stone-id="${s.id}">
+      ${s.id === today.id && !todaySeen() ? '<span class="mini-tag">today</span>' : ''}
       ${escapeHtml(getStoneHeadline(s))}
     </button>
   `).join('');

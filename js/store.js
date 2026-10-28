@@ -114,6 +114,22 @@ const account = {
   signIn: null, sendLink: null, confirm: null, signOut: null
 };
 
+// Today's stone: the same for everyone on a given (local) day. Stepping by 17, which shares
+// no factor with 48, visits every stone in turn while moving between the three themes.
+function dayKey(d = new Date()) {
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+function todayStone(d = new Date()) {
+  const days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+  return STONES[(days * 17) % STONES.length];
+}
+
+// Whether today's stone has been visited yet today
+function todaySeen() {
+  return load('meditations_today_v1', '') === dayKey();
+}
+
 function isClaimed(stoneId) {
   const stone = STONE_BY_ID[stoneId];
   if (!stone) return false;
