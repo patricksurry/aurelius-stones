@@ -11,87 +11,101 @@ function renderProgress() {
   document.getElementById('progressBtn').title = 'Your progress: open the map (m)';
 }
 
-// The passage, headed by its place in the book between arrows back and on through the book
-function verseHtml(v) {
+// One passage on the stone's column: its place in the book, then the text. Only the current
+// passage shows the ‹ › back and on through the book; the others keep the space so nothing shifts.
+function leafHtml(v, current) {
   const idx = VERSES.indexOf(v);
   const prev = VERSES[idx - 1];
   const next = VERSES[idx + 1];
   return `
-    <div class="verse-current">
+    <div class="leaf ${current ? 'current' : ''}" data-ref="${v.id}" ${current ? '' : `title="${v.id} on this stone"`}>
       <div class="verse-head">
         <button class="book-step chrome-soft" ${prev ? `data-step="-1" title="Back through the book: ${prev.id} (←)"` : 'disabled'} aria-label="Back through the book">${CHEVRON_LEFT}</button>
-        <span class="verse-ref ${state.read.has(v.id) ? 'read' : ''}" id="activeRef" title="Where this sits in the book (m)">${v.id}</span>
+        <span class="verse-ref ${state.read.has(v.id) ? 'read' : ''}" ${current ? 'id="activeRef"' : ''} title="Where this sits in the book (m)">${v.id}</span>
         <button class="book-step chrome-soft" ${next ? `data-step="1" title="On through the book: ${next.id} (→)"` : 'disabled'} aria-label="On through the book">${CHEVRON_RIGHT}</button>
       </div>
-      <div class="verse-clip">
-        <div class="verse">
-          <div class="verse-english">${v.english}</div>
-          <div class="verse-greek">${v.greek}</div>
-        </div>
+      <div class="verse">
+        <div class="verse-english">${v.english}</div>
+        <div class="verse-greek">${v.greek}</div>
       </div>
     </div>
   `;
 }
 
-const CHEVRON_UP = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10l4.5-4.5 4.5 4.5"/></svg>';
-const CHEVRON_DOWN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6l4.5 4.5 4.5-4.5"/></svg>';
 const CHEVRON_LEFT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg>';
 const CHEVRON_RIGHT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg>';
 // The footer's two lenses: an open book to study, an alpha for the Greek
 const BOOK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.2 5 7.6 4.5 4 4.5v13c3.6 0 6.2.5 8 2 1.8-1.5 4.4-2 8-2v-13c-3.6 0-6.2.5-8 2z"/><path d="M12 6.5v13"/></svg>';
 const ALPHA_ICON = '<span class="glyph" aria-hidden="true">α</span>';
 
-function neighborBodyHtml(v) {
-  if (!v) return '';
-  const eng = escapeHtml(v.english.replace(/<[^>]*>/g, ''));
-  const grk = escapeHtml(v.greek);
-  return `<span class="neighbor-clip"><span class="neighbor-body"><span class="neighbor-english">${eng}</span><span class="neighbor-greek">${grk}</span></span></span>`;
-}
-
-// The passage, framed by a faded glimpse of the closing lines of the passage before it
-// and the opening lines of the passage after it on this stone, with a ribbon of dots down the right margin
+// The stone: all its passages in one column, seen through a window sized to the current one,
+// with a glimpse of the passages either side fading at its edges
 function passageHtml(stone, activeV) {
-  const ids = stone.verseIds;
-  const idx = ids.indexOf(activeV.id);
-  const prev = VERSE_BY_ID[ids[idx - 1]];
-  const next = VERSE_BY_ID[ids[idx + 1]];
-  const pager = `
-    <div class="pager chrome"><div class="pager-dots">
-      ${ids.map(id => VERSE_BY_ID[id]).map(v => `
-        <button class="pager-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === activeV.id ? 'current' : ''}" ${v.id === activeV.id ? 'id="currentDot"' : ''}
-                data-ref="${v.id}" title="${v.id} — ${escapeHtml(incipit(v))}"></button>
-      `).join('')}
-    </div></div>`;
-  if (ids.length < 2) return `<div class="passage">${pager}<div class="passage-track">${verseHtml(activeV)}</div></div>`;
   return `
     <div class="passage">
-      ${pager}
-      <div class="passage-track">
-        <button class="neighbor prev chrome-soft" ${prev ? `data-ref="${prev.id}"` : 'disabled'} title="Previous passage on this stone (↑)">
-          ${CHEVRON_UP}
-          ${neighborBodyHtml(prev)}
-        </button>
-        ${verseHtml(activeV)}
-        <button class="neighbor next chrome-soft" ${next ? `data-ref="${next.id}"` : 'disabled'} title="Next passage on this stone (↓)">
-          ${CHEVRON_DOWN}
-          ${neighborBodyHtml(next)}
-        </button>
+      <div class="stone-window" id="stoneWindow">
+        <div class="stone-column">
+          ${stone.verseIds.map(id => leafHtml(VERSE_BY_ID[id], id === activeV.id)).join('')}
+        </div>
       </div>
     </div>`;
 }
 
-// Slide the ribbon so the current passage's dot sits level with the middle of its text;
-// the margin clips the ribbon, so on a short passage only the nearby dots show
-function positionPager() {
-  const pager = document.querySelector('.pager');
-  const dot = document.getElementById('currentDot');
-  const verse = document.querySelector('.passage .verse');
-  if (!pager || !dot || !verse) return;
-  const p = pager.getBoundingClientRect();
-  const v = verse.getBoundingClientRect();
-  const mid = v.top + v.height / 2 - p.top;
-  const dotMid = dot.offsetTop + dot.offsetHeight / 2;
-  pager.firstElementChild.style.transform = `translateY(${mid - dotMid}px)`;
+// Down the card's right margin, a ribbon of dots: one per passage on the stone, filled in as each
+// is read. It stays in view down a long passage.
+function pagerHtml(stone, activeV) {
+  return `
+    <div class="pager-rail">
+      <div class="pager chrome">
+        ${stone.verseIds.map(id => VERSE_BY_ID[id]).map(v => `
+          <button class="pager-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === activeV.id ? 'current' : ''}" ${v.id === activeV.id ? 'id="currentDot"' : ''}
+                  data-ref="${v.id}" title="${v.id} — ${escapeHtml(incipit(v))}"></button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+// Move the current passage to ref without redrawing the stone: the inks, ids and ribbon follow
+function setCurrentLeaf(ref) {
+  document.querySelectorAll('.leaf').forEach(el => {
+    const on = el.dataset.ref === ref;
+    el.classList.toggle('current', on);
+    el.title = on ? '' : `${el.dataset.ref} on this stone`;
+    el.querySelector('.verse-ref').id = on ? 'activeRef' : '';
+  });
+  document.querySelectorAll('.pager-dot').forEach(el => {
+    const on = el.dataset.ref === ref;
+    el.classList.toggle('current', on);
+    el.id = on ? 'currentDot' : '';
+    if (!on) el.style.removeProperty('--dwell');
+  });
+}
+
+// Size the window to the current passage plus an edge either side, and slide the column so
+// that passage sits in it. Animated, the column and the window glide together over `ms`.
+const WINDOW_EDGE_REM = 3.6;
+const WINDOW_END_REM = 0.6;
+function layoutWindow(ms = 0) {
+  const win = document.getElementById('stoneWindow');
+  const leaf = win && win.querySelector('.leaf.current');
+  if (!leaf) return;
+  const column = win.firstElementChild;
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  // At either end of the stone there's nothing to glimpse, so the window closes in
+  const prev = leaf.previousElementSibling;
+  const next = leaf.nextElementSibling;
+  const top = (prev ? WINDOW_EDGE_REM : WINDOW_END_REM) * rem;
+  // Below, reach past the next passage's reference to its opening lines
+  const bottom = next
+    ? WINDOW_EDGE_REM * rem + next.querySelector('.verse').offsetTop - next.offsetTop
+    : WINDOW_END_REM * rem;
+  const ease = ms ? `${ms}ms cubic-bezier(0.45, 0.05, 0.25, 1)` : 'none';
+  win.style.transition = ms ? `height ${ease}, --edge-top ${ease}, --edge-bottom ${ease}` : 'none';
+  win.style.setProperty('--edge-top', `${top}px`);
+  win.style.setProperty('--edge-bottom', `${bottom}px`);
+  column.style.transition = ms ? `transform ${ease}` : 'none';
+  win.style.height = `${leaf.offsetHeight + top + bottom}px`;
+  column.style.transform = `translateY(${top - leaf.offsetTop}px)`;
 }
 
 // First line of a passage, shown when hovering its dot in the stone's ribbon or on the map
@@ -155,6 +169,7 @@ function render() {
       </div>
 
       ${passageHtml(stone, activeV)}
+      ${pagerHtml(stone, activeV)}
 
       <div class="divider"></div>
 
@@ -174,9 +189,17 @@ function render() {
       el.title = p.description ? `${p.name} · ${p.description}` : p.name;
     });
 
-    positionPager();
-    surface.querySelectorAll('.neighbor[data-ref], .pager-dot').forEach(el => {
+    layoutWindow();
+    surface.querySelectorAll('.pager-dot').forEach(el => {
       el.addEventListener('click', () => goToVerse(el.getAttribute('data-ref')));
+    });
+    // A glimpsed passage at the window's edge: click it to bring it into view
+    surface.querySelectorAll('.leaf').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (el.classList.contains('current')) return;
+        e.stopPropagation();
+        goToVerse(el.dataset.ref);
+      });
     });
     surface.querySelectorAll('.book-step[data-step]').forEach(el => {
       el.addEventListener('click', () => stepLinear(Number(el.getAttribute('data-step'))));

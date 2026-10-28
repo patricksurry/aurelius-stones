@@ -325,32 +325,80 @@ body.show-greek .verse {
   grid-template-columns: 1fr 1fr;
 }
 
-/* The passage with a glimpse of its neighbours on the stone, like a column read in a scroll */
+/* The stone: all its passages in one column, seen through a window sized to the current one.
+   The edges fade, so the passages either side show only as a glimpse. */
 .passage {
   position: relative;
-  margin-top: 1.25rem;
+  margin-top: 0.5rem;
   transition: opacity 0.22s ease;
 }
 
-/* The ribbon: this stone's passages, one dot each, down the card's right margin like a scrollbar.
-   Clipped to the passage and faded at its ends, so only the nearby dots show on a short one. */
-.pager {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: calc(-1 * var(--pad-x));
-  width: var(--pad-x);
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
-  mask-image: linear-gradient(transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
+/* The fades follow the window's edges as they open and close, so they're registered to glide */
+@property --edge-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
 
-.pager-dots {
+@property --edge-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+.stone-window {
   position: relative;
+  overflow: hidden;
+  /* Room for the ‹ hanging in the left margin */
+  margin-left: -1.5rem;
+  padding-left: 1.5rem;
+  -webkit-mask-image: linear-gradient(transparent, rgba(0, 0, 0, 0.55) calc(var(--edge-top) * 0.55), #000 var(--edge-top), #000 calc(100% - var(--edge-bottom)), rgba(0, 0, 0, 0.55) calc(100% - var(--edge-bottom) * 0.55), transparent);
+  mask-image: linear-gradient(transparent, rgba(0, 0, 0, 0.55) calc(var(--edge-top) * 0.55), #000 var(--edge-top), #000 calc(100% - var(--edge-bottom)), rgba(0, 0, 0, 0.55) calc(100% - var(--edge-bottom) * 0.55), transparent);
+}
+
+.stone-column {
+  will-change: transform;
+}
+
+.leaf {
+  padding: 0.8rem 0;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.9s ease;
+}
+
+.leaf:hover {
+  opacity: 0.6;
+}
+
+.leaf.current {
+  opacity: 1;
+  cursor: auto;
+}
+
+/* Only the passage in the window steps through the book */
+.leaf:not(.current) .book-step {
+  visibility: hidden;
+}
+
+/* The ribbon: this stone's passages down the card's right margin, one dot each, filled in
+   as each is read. It starts beside the headline and stays put whatever the passage,
+   sticking in view down a long one. */
+.pager-rail {
+  position: absolute;
+  top: 2.5rem;
+  bottom: 1.5rem;
+  right: 0;
+  width: var(--pad-x);
+}
+
+.pager {
+  position: sticky;
+  top: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.95rem;
+  gap: 0.7rem;
 }
 
 /* Place in the book: ‹ IX.6 › above the passage, the arrows back and on through the book */
@@ -392,112 +440,8 @@ body.show-greek .verse {
   opacity: 0;
 }
 
-.passage .verse {
+.leaf .verse {
   margin-top: 0;
-}
-
-.verse-clip {
-  display: flex;
-  flex-direction: column;
-}
-
-/* The ˄ ˅ hang in the left margin, under the ‹, so every line of text shares one left edge */
-.neighbor {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  width: calc(100% + 1.5rem);
-  margin-left: -1.5rem;
-  background: none;
-  border: none;
-  padding: 0.25rem 0;
-  text-align: left;
-  font-family: var(--font);
-  font-size: 1.05rem;
-  line-height: 1.48;
-  color: var(--ink-faint);
-  cursor: pointer;
-  transition: color 0.2s ease, opacity 0.9s ease;
-}
-
-.neighbor.prev {
-  margin-bottom: 0.65rem;
-}
-
-.neighbor.next {
-  margin-top: 0.65rem;
-}
-
-.neighbor:hover:not(:disabled) {
-  color: var(--ink-mid);
-}
-
-/* First or last on the stone: the arrow goes, but keeps its place so the passage doesn't shift */
-.neighbor:disabled {
-  visibility: hidden;
-  min-height: 3.25rem;
-}
-
-.neighbor svg {
-  flex: 0 0 1.5rem;
-  width: 1.5rem;
-  height: 12px;
-}
-
-.neighbor.prev svg {
-  align-self: flex-end;
-  margin-bottom: 0.25rem;
-}
-
-.neighbor.next svg {
-  align-self: flex-start;
-  margin-top: 0.25rem;
-}
-
-/* Clipped glimpse of the adjacent passage: closing lines for prev, opening lines for next */
-.neighbor-clip {
-  flex: 1;
-  min-width: 0;
-  height: 2.75rem;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.neighbor.prev .neighbor-clip {
-  justify-content: flex-end;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 42%, #000 88%);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 42%, #000 88%);
-}
-
-.neighbor.next .neighbor-clip {
-  justify-content: flex-start;
-  -webkit-mask-image: linear-gradient(to bottom, #000 12%, rgba(0, 0, 0, 0.5) 58%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 12%, rgba(0, 0, 0, 0.5) 58%, transparent 100%);
-}
-
-.neighbor-body {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  align-items: baseline;
-}
-
-body.show-greek .neighbor-body {
-  grid-template-columns: 1fr 1fr;
-}
-
-.neighbor-english {
-  max-width: 38em;
-}
-
-.neighbor-greek {
-  display: none;
-  color: var(--ink-greek);
-}
-
-body.show-greek .neighbor-greek {
-  display: block;
 }
 
 .verse-english {
@@ -563,9 +507,7 @@ body.show-greek .verse-greek {
   transition: transform 0.18s ease;
 }
 
-.pager-dot::before,
-.map-dot::before,
-.stone-ellipse::before {
+.pager-dot::before {
   content: '';
   position: absolute;
   inset: -6px;
@@ -1064,6 +1006,14 @@ body.idle .chrome-soft:not(:hover) {
   gap: 0.45rem;
 }
 
+/* A larger hit area than the drawn dot */
+.map-dot::before,
+.stone-ellipse::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
 .map-dot {
   position: relative;
   width: 7px;
@@ -1304,6 +1254,8 @@ body.idle .chrome-soft:not(:hover) {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
+  /* A breath between the headline and its passages */
+  margin-top: 0.3rem;
   padding-left: calc(14px + 0.55rem);
 }
 
@@ -1468,6 +1420,14 @@ body.idle .chrome-soft:not(:hover) {
   color: var(--ink-faint);
 }
 
+/* Still, for those who'd rather: the window jumps instead of gliding */
+@media (prefers-reduced-motion: reduce) {
+  .stone-window,
+  .stone-column {
+    transition: none !important;
+  }
+}
+
 @media (hover: none) and (pointer: coarse) {
   .progress-caption {
     opacity: 0.75;
@@ -1495,8 +1455,7 @@ body.idle .chrome-soft:not(:hover) {
   .stone {
     padding: 1.75rem var(--pad-x) 1.25rem;
   }
-  body.show-greek .verse,
-  body.show-greek .neighbor-body {
+  body.show-greek .verse {
     grid-template-columns: 1fr;
     gap: 0.65rem;
   }
