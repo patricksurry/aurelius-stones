@@ -11,8 +11,8 @@ const STONE_BY_ID = Object.fromEntries(STONES.map(s => [s.id, s]));
 const VERSE_BY_ID = Object.fromEntries(VERSES.map(v => [v.id, v]));
 
 // A passage counts as read after dwelling on it at a contemplative pace
-const READ_WPM = 200;
-const READ_MIN_MS = 3000;
+const READ_WPM = 160;
+const READ_MIN_MS = 4000;
 const IDLE_MS = 7000;
 
 
