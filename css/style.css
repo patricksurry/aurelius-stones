@@ -178,63 +178,14 @@ body:not(.map-seen) .progress-caption {
   position: relative;
 }
 
-/* Back and on through the book, just outside the card, level with its middle */
-.book-rail {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2.5rem;
-  display: flex;
-  align-items: center;
-}
-
-.book-rail.prev {
-  left: -3.25rem;
-}
-
-.book-rail.next {
-  right: -3.25rem;
-}
-
-.book-step {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 3.5rem;
-  padding: 0;
-  background: none;
-  border: none;
-  color: var(--ink-faint);
-  cursor: pointer;
-}
-
-.book-step svg {
-  width: 16px;
-  height: 16px;
-}
-
-.book-step:hover {
-  color: var(--ink);
-}
-
-/* Nothing that way: no arrow */
-.book-step:disabled {
-  visibility: hidden;
-}
-
-/* No room beside the card, or touch (swipe instead) */
-@media (max-width: 900px), (hover: none) {
-  .book-rail {
-    display: none;
-  }
-}
 
 .stone {
+  /* Side padding doubles as the margin the ribbon of passages runs down */
+  --pad-x: 3.25rem;
   background: var(--stone-bg);
   border: 1px solid var(--hairline);
   border-radius: 26px 30px 24px 28px;
-  padding: 2.75rem 3.25rem 1.5rem;
+  padding: 2.75rem var(--pad-x) 1.5rem;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.035);
   transition: background 0.35s ease, border-color 0.35s ease, opacity 0.22s ease;
   position: relative;
@@ -335,8 +286,65 @@ body.show-greek .verse {
 
 /* The passage with a glimpse of its neighbours on the stone, like a column read in a scroll */
 .passage {
+  position: relative;
   margin-top: 1.25rem;
   transition: opacity 0.22s ease;
+}
+
+/* The ribbon: this stone's passages, one dot each, down the card's right margin like a scrollbar.
+   Clipped to the passage and faded at its ends, so only the nearby dots show on a short one. */
+.pager {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(-1 * var(--pad-x));
+  width: var(--pad-x);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
+  mask-image: linear-gradient(transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
+}
+
+.pager-dots {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.95rem;
+}
+
+/* Place in the book: ‹ IX.6 › above the passage, the arrows back and on through the book */
+/* The ‹ hangs in the left margin, so the reference lines up with the text */
+.verse-head {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.3rem -1.5rem;
+}
+
+.book-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+
+.book-step svg {
+  width: 12px;
+  height: 12px;
+}
+
+.book-step:hover {
+  color: var(--ink);
+}
+
+/* Nothing that way: no arrow */
+.book-step:disabled {
+  visibility: hidden;
 }
 
 .passage.fading {
@@ -347,11 +355,13 @@ body.show-greek .verse {
   margin-top: 0;
 }
 
+/* The ˄ ˅ hang in the left margin, under the ‹, so every line of text shares one left edge */
 .neighbor {
   display: flex;
   align-items: baseline;
-  gap: 0.6rem;
-  width: 100%;
+  gap: 0;
+  width: calc(100% + 1.5rem);
+  margin-left: -1.5rem;
   background: none;
   border: none;
   padding: 0.35rem 0;
@@ -381,9 +391,9 @@ body.show-greek .verse {
 }
 
 .neighbor svg {
-  flex-shrink: 0;
-  width: 14px;
-  height: 14px;
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  height: 12px;
   align-self: center;
 }
 
@@ -416,7 +426,7 @@ body.show-greek .verse-greek {
 .verse-ref {
   font-size: 0.85rem;
   color: var(--ink-faint);
-  margin-right: 0.55rem;
+  margin: 0 0.1rem;
   font-variant-numeric: tabular-nums;
   transition: color 1.2s ease;
 }
@@ -442,18 +452,12 @@ body.show-greek .verse-greek {
 }
 
 /* =====================================================
-   STONE PAGER: ALL THE PASSAGES ON THIS STONE (CARD FOOTER)
+   STONE PAGER: ALL THE PASSAGES ON THIS STONE (DOWN THE MARGIN)
    ===================================================== */
-.pager-dots {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
 .pager-dot {
   --dot: color-mix(in srgb, var(--ink-faint) 65%, transparent);
   position: relative;
+  flex-shrink: 0;
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -1207,6 +1211,9 @@ body.idle .chrome-soft:not(:hover) {
 }
 
 @media (max-width: 680px) {
+  .stone {
+    --pad-x: 1.5rem;
+  }
   /* The progress caption tucks under its lines, so the top bar never outgrows the screen */
   .progress-btn {
     flex-direction: column;
@@ -1219,7 +1226,7 @@ body.idle .chrome-soft:not(:hover) {
     width: 9rem;
   }
   .stone {
-    padding: 1.75rem 1.5rem 1.25rem;
+    padding: 1.75rem var(--pad-x) 1.25rem;
   }
   body.show-greek .verse {
     grid-template-columns: 1fr;

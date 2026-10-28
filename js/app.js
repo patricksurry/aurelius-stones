@@ -5,6 +5,7 @@ function toggleGreek() {
   prefs.greek = !prefs.greek;
   store('meditations_prefs_v1', prefs);
   document.body.classList.toggle('show-greek', prefs.greek);
+  positionPager();
   const btn = document.getElementById('greekToggle');
   if (btn) btn.classList.toggle('on', prefs.greek);
 }
@@ -116,8 +117,8 @@ function markRead(ref) {
   if (currentDot) currentDot.classList.add('read');
   renderProgress();
   offerOwnWords();
-  // Earned: the pager dots show themselves for a moment, the dot swells and settles; the reading line glows
-  const dots = document.querySelector('.pager-dots');
+  // Earned: the ribbon of dots shows itself for a moment, the dot swells and settles; the reading line glows
+  const dots = document.querySelector('.pager');
   if (dots) {
     dots.classList.add('revealed');
     setTimeout(() => dots.classList.remove('revealed'), 2600);
@@ -188,8 +189,9 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 systemDark.addEventListener('change', applyTheme);
 
 document.getElementById('progressBtn').addEventListener('click', toggleMap);
-document.getElementById('bookPrev').addEventListener('click', () => stepLinear(-1));
-document.getElementById('bookNext').addEventListener('click', () => stepLinear(1));
+// The ribbon follows its reference as the text reflows
+window.addEventListener('resize', positionPager);
+if (document.fonts) document.fonts.ready.then(positionPager);
 const stoneEl = document.getElementById('stoneSurface');
 stoneEl.addEventListener('click', (e) => {
   if (e.target.id === 'activeRef') toggleMap();

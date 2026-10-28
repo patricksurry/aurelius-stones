@@ -11,25 +11,19 @@ function renderProgress() {
   document.getElementById('progressBtn').title = 'Your progress: open the map (m)';
 }
 
-// Faint arrows either side of the card: back and on through the book, in Marcus's order
-function renderBookSteps() {
-  const idx = VERSES.findIndex(v => v.id === state.currentVerseRef);
-  [['bookPrev', VERSES[idx - 1], 'Back through the book', '←', CHEVRON_LEFT],
-   ['bookNext', VERSES[idx + 1], 'On through the book', '→', CHEVRON_RIGHT]]
-    .forEach(([id, v, label, key, icon]) => {
-      const btn = document.getElementById(id);
-      if (!btn.innerHTML) btn.innerHTML = icon;
-      btn.disabled = !v;
-      btn.title = v ? `${label}: ${v.id} (${key})` : (id === 'bookPrev' ? 'The start of the book' : 'The end of the book');
-    });
-}
-
+// The passage, headed by its place in the book between arrows back and on through the book
 function verseHtml(v) {
+  const idx = VERSES.indexOf(v);
+  const prev = VERSES[idx - 1];
+  const next = VERSES[idx + 1];
   return `
+    <div class="verse-head">
+      <button class="book-step chrome-soft" ${prev ? `data-ref="${prev.id}" title="Back through the book: ${prev.id} (←)"` : 'disabled'} aria-label="Back through the book">${CHEVRON_LEFT}</button>
+      <span class="verse-ref ${state.read.has(v.id) ? 'read' : ''}" id="activeRef" title="Where this sits in the book (m)">${v.id}</span>
+      <button class="book-step chrome-soft" ${next ? `data-ref="${next.id}" title="On through the book: ${next.id} (→)"` : 'disabled'} aria-label="On through the book">${CHEVRON_RIGHT}</button>
+    </div>
     <div class="verse">
-      <div class="verse-english">
-        <span class="verse-ref ${state.read.has(v.id) ? 'read' : ''}" id="activeRef" title="Where this sits in the book (m)">${v.id}</span>${v.english}
-      </div>
+      <div class="verse-english">${v.english}</div>
       <div class="verse-greek">${v.greek}</div>
     </div>
   `;
@@ -43,15 +37,24 @@ const CHEVRON_RIGHT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor
 const BOOK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.2 5 7.6 4.5 4 4.5v13c3.6 0 6.2.5 8 2 1.8-1.5 4.4-2 8-2v-13c-3.6 0-6.2.5-8 2z"/><path d="M12 6.5v13"/></svg>';
 const ALPHA_ICON = '<span class="glyph" aria-hidden="true">α</span>';
 
-// The passage, with a glimpse of the start of the ones before and after it on this stone
+// The passage, with a glimpse of the start of the ones before and after it on this stone,
+// and down the right margin a ribbon of dots, one for each passage on the stone
 function passageHtml(stone, activeV, entering) {
   const ids = stone.verseIds;
-  if (ids.length < 2) return `<div class="passage ${entering ? 'fading' : ''}">${verseHtml(activeV)}</div>`;
   const idx = ids.indexOf(activeV.id);
   const prev = VERSE_BY_ID[ids[idx - 1]];
   const next = VERSE_BY_ID[ids[idx + 1]];
+  const pager = `
+    <div class="pager chrome"><div class="pager-dots">
+      ${ids.map(id => VERSE_BY_ID[id]).map(v => `
+        <button class="pager-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === activeV.id ? 'current' : ''}" ${v.id === activeV.id ? 'id="currentDot"' : ''}
+                data-ref="${v.id}" title="${v.id} — ${escapeHtml(incipit(v))}"></button>
+      `).join('')}
+    </div></div>`;
+  if (ids.length < 2) return `<div class="passage ${entering ? 'fading' : ''}">${pager}${verseHtml(activeV)}</div>`;
   return `
     <div class="passage ${entering ? 'fading' : ''}">
+      ${pager}
       <button class="neighbor prev chrome-soft" ${prev ? `data-ref="${prev.id}"` : 'disabled'} title="Previous passage on this stone (↑)">
         ${CHEVRON_UP}
         ${prev ? `<span class="neighbor-text">${escapeHtml(incipit(prev))}</span>` : ''}
@@ -64,7 +67,21 @@ function passageHtml(stone, activeV, entering) {
     </div>`;
 }
 
-// First line of a passage, shown when hovering its dot in the stone pager
+// Slide the ribbon so the current passage's dot sits level with the middle of its text;
+// the margin clips the ribbon, so on a short passage only the nearby dots show
+function positionPager() {
+  const pager = document.querySelector('.pager');
+  const dot = document.getElementById('currentDot');
+  const verse = document.querySelector('.passage .verse');
+  if (!pager || !dot || !verse) return;
+  const p = pager.getBoundingClientRect();
+  const v = verse.getBoundingClientRect();
+  const mid = v.top + v.height / 2 - p.top;
+  const dotMid = dot.offsetTop + dot.offsetHeight / 2;
+  pager.firstElementChild.style.transform = `translateY(${mid - dotMid}px)`;
+}
+
+// First line of a passage, shown when hovering its dot in the stone's ribbon
 function incipit(v) {
   const words = v.english.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean);
   return words.length > 14 ? words.slice(0, 14).join(' ') + '…' : words.join(' ');
@@ -103,10 +120,8 @@ function render() {
   const earned = stone.verseIds.some(id => state.read.has(id));
 
   renderProgress();
-  renderBookSteps();
   if (stone.id === todayStone().id) store('meditations_today_v1', dayKey());
 
-  const stoneVerses = stone.verseIds.map(id => VERSE_BY_ID[id]).filter(Boolean);
   const activeV = VERSE_BY_ID[state.currentVerseRef];
 
   const surface = document.getElementById('stoneSurface');
@@ -127,12 +142,6 @@ function render() {
                 placeholder="Reflections…">${escapeHtml(user.reflection || '')}</textarea>
 
       <div class="card-foot">
-        <div class="pager-dots chrome">
-          ${stoneVerses.map(v => `
-            <button class="pager-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === activeV.id ? 'current' : ''}" ${v.id === activeV.id ? 'id="currentDot"' : ''}
-                    data-ref="${v.id}" title="${v.id} — ${escapeHtml(incipit(v))}"></button>
-          `).join('')}
-        </div>
         <div class="lens chrome">
           <button class="quiet-btn lens-icon ${prefs.greek ? 'on' : ''}" id="greekToggle" title="The Greek alongside (g)" aria-label="Show the Greek">${ALPHA_ICON}</button>
           <button class="quiet-btn lens-icon" onclick="flipStone()" title="Study: another translation, commentary, the people named (f)" aria-label="Study">${BOOK_ICON}</button>
@@ -145,7 +154,8 @@ function render() {
       el.title = p.description ? `${p.name} · ${p.description}` : p.name;
     });
 
-    surface.querySelectorAll('.neighbor[data-ref], .pager-dot').forEach(el => {
+    positionPager();
+    surface.querySelectorAll('.neighbor[data-ref], .pager-dot, .book-step[data-ref]').forEach(el => {
       el.addEventListener('click', () => goToVerse(el.getAttribute('data-ref')));
     });
 
