@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 
 from sources import load_commentary, load_long
 from stamp import stamp
+from verify import verify
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -171,7 +172,11 @@ def link_people(verses):
         v["people"] = list(dict.fromkeys(pid for _, _, pid in sorted(found)))
 
     return {
-        p["id"]: {"name": wiki[p["id"]]["title"], "url": wiki[p["id"]]["url"], "description": wiki[p["id"]]["description"]}
+        p["id"]: {
+            "name": wiki[p["id"]]["title"],
+            "url": wiki[p["id"]]["url"],
+            "description": wiki[p["id"]]["description"] or p.get("description", ""),
+        }
         for p in spec if p["id"] in wiki
     }
 
@@ -243,6 +248,7 @@ def main():
 
     # Version the data file's URL by its content, so browsers never pair new code with a stale cached copy
     stamp()  # version index.html's links to the data, CSS and JS
+    verify()
 
     print(f"Built dataset: {len(books_out)} books, {len(verses)} verses, {len(stones_out)} stones.")
     for s in stones_out[:10]:

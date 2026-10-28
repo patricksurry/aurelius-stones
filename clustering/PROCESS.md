@@ -55,16 +55,21 @@ Each maxim was written after re-reading the stone's passages, under these rules:
 
 The maxims are meant as a suggestion to replace. The app invites you to rewrite each one in your own words.
 
-## 6. Relatedness
+## 6. Relatedness and verification
 
 `affinity.py` averages the passage embeddings of each stone and ranks every other stone by cosine similarity. The app shows the top few as related stones. Here the embeddings are used for what they're good at: rough closeness of meaning across many passages at once.
+
+Two further checks verify the generated data:
+
+- `affinity.py` embeds both Farquharson's and George Long's translations to check that each stone's centroid agrees across translations, and compares each stone's maxim embedding against all 48 stone centroids to flag any summary that sits closer to another stone than its own.
+- `verify.py` (run automatically by `build_data.py`) checks that all 488 passages are partitioned across the 48 stones (6–16 passages each), every maxim is 4–12 words and shares core vocabulary with its passages, and every stone's TF-IDF profile in Farquharson's translation matches its own profile in Long's translation ahead of all other 47 stones.
 
 ## Reproducing
 
 ```sh
 python3 clustering/stones.py      # tags.tsv + mapping -> stones.json
 uv run clustering/affinity.py     # stones.json + passages -> affinity.json (downloads the model on first run)
-python3 build_data.py             # -> data/meditations.json / .js
+python3 build_data.py             # -> data/meditations.json / .js (runs verify.py)
 ```
 
 ## Known limits

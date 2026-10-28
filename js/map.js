@@ -24,6 +24,75 @@ function clearHtml(claimedCount) {
     <button class="quiet-btn" id="clearNo">keep</button>`;
 }
 
+function stonesListHtml(current) {
+  const today = todayStone();
+  return `
+    <div class="map-stones-themes">
+      ${DISCIPLINES.map(d => `
+        <div class="map-theme-group">
+          <div class="map-theme-head">
+            <span class="map-theme">${d.id}</span>
+            <span class="map-theme-hint">· ${d.hint}</span>
+          </div>
+          <div class="map-stone-list">
+            ${STONES.filter(s => s.discipline === d.id).map(s => {
+              const claimed = isClaimed(s.id);
+              const isCurrent = s.id === state.currentStoneId;
+              const isToday = s.id === today.id;
+              return `
+                <div class="map-stone-item ${claimed ? 'claimed' : ''} ${isCurrent ? 'current' : ''}" data-stone-item="${s.id}">
+                  <button class="map-stone-row" data-stone-id="${s.id}">
+                    <span class="stone-ellipse ${claimed ? 'claimed' : ''} ${isCurrent ? 'current' : ''} ${isToday ? 'today' : ''}" aria-hidden="true"></span>
+                    <span class="map-stone-maxim ${claimed ? 'claimed' : ''}">${escapeHtml(getStoneHeadline(s))}</span>
+                  </button>
+                  <div class="map-stone-dots">
+                    ${s.verseIds.map(id => VERSE_BY_ID[id]).map(v => `
+                      <button class="map-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === current.id ? 'current' : ''}"
+                              data-ref="${v.id}" aria-label="${v.id}"></button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function booksViewHtml(current) {
+  const today = todayStone();
+  return `
+    ${BOOKS.map(b => `
+      <div class="map-book">
+        <span class="map-numeral" title="${escapeHtml(b.heading || `Book ${b.roman}`)}">${b.roman}</span>
+        <div class="map-dots">
+          ${VERSES.filter(v => v.book === b.book).map(v => `
+            <button class="map-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === current.id ? 'current' : ''}"
+                    data-ref="${v.id}" aria-label="${v.id}"></button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+
+    <div class="map-section">STONES</div>
+    <div class="map-stones">
+      ${DISCIPLINES.map(d => `
+        <div class="map-discipline">
+          <span class="map-theme" title="${d.hint}">${d.id}</span>
+          <div class="map-pebbles">
+            ${STONES.filter(s => s.discipline === d.id).map(s => `
+              <button class="stone-ellipse ${isClaimed(s.id) ? 'claimed' : ''} ${s.id === state.currentStoneId ? 'current' : ''} ${s.id === today.id ? 'today' : ''}"
+                      data-stone-id="${s.id}" aria-label="${escapeHtml(getStoneHeadline(s))}"></button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
 function renderMap() {
   const mapEl = document.getElementById('map');
   mapEl.hidden = !state.mapOpen;
@@ -31,43 +100,24 @@ function renderMap() {
 
   const claimedCount = STONES.filter(s => isClaimed(s.id)).length;
   const current = VERSE_BY_ID[state.currentVerseRef];
+  const byBook = prefs.mapView === 'books';
 
   mapEl.innerHTML = `
     <div class="map-inner">
       <div class="map-head">
         <span>${state.read.size} of ${VERSES.length} passages read · ${claimedCount} of ${STONES.length} stones claimed</span>
         <span class="map-actions">
+          <span class="map-view-toggle">
+            <button class="quiet-btn ${!byBook ? 'on' : ''}" data-map-view="stones">by stone</button>
+            ·
+            <button class="quiet-btn ${byBook ? 'on' : ''}" data-map-view="books">by book</button>
+          </span>
           <button class="quiet-btn map-icon" id="mapAbout" title="About" aria-label="About"><span class="glyph circled" aria-hidden="true">?</span></button>
           <button class="quiet-btn map-icon" id="mapClose" title="Close (Esc)" aria-label="Close">${CLOSE_ICON}</button>
         </span>
       </div>
 
-      ${BOOKS.map(b => `
-        <div class="map-book">
-          <span class="map-numeral" title="${escapeHtml(b.heading || `Book ${b.roman}`)}">${b.roman}</span>
-          <div class="map-dots">
-            ${VERSES.filter(v => v.book === b.book).map(v => `
-              <button class="map-dot ${state.read.has(v.id) ? 'read' : ''} ${v.id === current.id ? 'current' : ''}"
-                      data-ref="${v.id}" aria-label="${v.id}"></button>
-            `).join('')}
-          </div>
-        </div>
-      `).join('')}
-
-      <div class="map-section">STONES</div>
-      <div class="map-stones">
-        ${DISCIPLINES.map(d => `
-          <div class="map-discipline">
-            <span class="map-theme" title="${d.hint}">${d.id}</span>
-            <div class="map-pebbles">
-              ${STONES.filter(s => s.discipline === d.id).map(s => `
-                <button class="stone-ellipse ${isClaimed(s.id) ? 'claimed' : ''} ${s.id === state.currentStoneId ? 'current' : ''} ${s.id === todayStone().id ? 'today' : ''}"
-                        data-stone-id="${s.id}" aria-label="${escapeHtml(getStoneHeadline(s))}"></button>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
+      ${byBook ? booksViewHtml(current) : stonesListHtml(current)}
 
       <div class="map-hover" id="mapHover"></div>
       <p class="map-hint" id="mapHint"></p>
@@ -81,18 +131,27 @@ function renderMap() {
 
   document.getElementById('mapClose').addEventListener('click', toggleMap);
   document.getElementById('mapAbout').addEventListener('click', () => { toggleMap(); showWelcome(); });
+  mapEl.querySelectorAll('[data-map-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      prefs.mapView = btn.dataset.mapView;
+      store('meditations_prefs_v1', prefs);
+      renderMap();
+    });
+  });
   renderAccount();
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
   on('clearAsk', () => { confirmingClear = true; renderMap(); });
   on('clearNo', () => { confirmingClear = false; renderMap(); });
   on('clearYes', () => { confirmingClear = false; clearProgress(); render(); renderMap(); });
 
-  // Pointing at a passage shows its opening beside it and lights its stone; pointing at a stone lights its passages.
-  // On touch screens (no hover), the preview sits at the foot instead: the first tap previews and lights;
-  // a second tap (or tapping the preview) goes there.
+  // In book view, pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages.
+  // In stone view, pointing at a passage circle shows its opening lines beside it.
+  // On touch screens (no hover), the preview sits at the foot instead: the first tap previews; a second tap goes there.
   const hover = document.getElementById('mapHover');
   const touchOnly = window.matchMedia('(hover: none)').matches;
-  const hintText = `${touchOnly ? 'Tap' : 'Point at'} a stone to see its passages, or a passage to see its stone.`;
+  const hintText = byBook
+    ? `${touchOnly ? 'Tap' : 'Point at'} a stone to see its passages, or a passage to see its stone.`
+    : `${touchOnly ? 'Tap' : 'Point at'} any passage circle to see its opening lines.`;
   const hint = touchOnly ? `<span class="hint">${hintText}</span>` : '';
   hover.classList.toggle('floating', !touchOnly);
   if (!touchOnly) document.getElementById('mapHint').textContent = hintText;
@@ -125,20 +184,28 @@ function renderMap() {
     litTarget = { stoneId, ref };
     if (touchOnly) hover.setAttribute('data-go', '1');
     const stone = STONE_BY_ID[stoneId];
-    stone.verseIds.forEach(id => mapEl.querySelector(`.map-dot[data-ref="${id}"]`).classList.add('lit'));
-    mapEl.querySelector(`.stone-ellipse[data-stone-id="${stoneId}"]`).classList.add('lit');
-    mapEl.querySelectorAll('.map-dots, .map-stones').forEach(el => el.classList.add('dim'));
     const goHint = touchOnly ? ' · tap again to open' : '';
-    hover.innerHTML = ref
-      ? `<span class="text"><span class="ref">${ref}</span>${escapeHtml(incipit(VERSE_BY_ID[ref]))}</span><span class="on-stone">${escapeHtml(getStoneHeadline(stone))}${goHint}</span>`
-      : `<span class="text">${escapeHtml(getStoneHeadline(stone))}</span><span class="on-stone">${stone.id === todayStone().id ? "today's stone · " : ''}${stone.discipline} · ${stone.verseIds.length} passages${goHint}</span>`;
-    if (!touchOnly && el) place(el);
+    if (byBook) {
+      stone.verseIds.forEach(id => mapEl.querySelector(`.map-dot[data-ref="${id}"]`).classList.add('lit'));
+      mapEl.querySelector(`.stone-ellipse[data-stone-id="${stoneId}"]`).classList.add('lit');
+      mapEl.querySelectorAll('.map-dots, .map-stones').forEach(c => c.classList.add('dim'));
+      hover.innerHTML = ref
+        ? `<span class="text"><span class="ref">${ref}</span>${escapeHtml(incipit(VERSE_BY_ID[ref]))}</span><span class="on-stone">${escapeHtml(getStoneHeadline(stone))}${goHint}</span>`
+        : `<span class="text">${escapeHtml(getStoneHeadline(stone))}</span><span class="on-stone">${stone.id === todayStone().id ? "today's stone · " : ''}${stone.discipline} · ${stone.verseIds.length} passages${goHint}</span>`;
+      if (!touchOnly && el) place(el);
+    } else if (ref) {
+      el.classList.add('lit');
+      hover.innerHTML = `<span class="text"><span class="ref">${ref}</span>${escapeHtml(incipit(VERSE_BY_ID[ref]))}</span>${touchOnly ? `<span class="on-stone">${escapeHtml(getStoneHeadline(stone))}${goHint}</span>` : ''}`;
+      if (!touchOnly && el) place(el);
+    } else if (touchOnly) {
+      hover.innerHTML = `<span class="text">${escapeHtml(getStoneHeadline(stone))}</span><span class="on-stone">${stone.id === todayStone().id ? "today's stone · " : ''}${stone.discipline} · ${stone.verseIds.length} passages${goHint}</span>`;
+    }
   };
   const onPoint = (e) => {
     const dot = e.target.closest('.map-dot');
-    const pebble = e.target.closest('.stone-ellipse');
+    const stoneBtn = byBook && e.target.closest('[data-stone-id]');
     if (dot) light(VERSE_BY_ID[dot.dataset.ref].stoneId, dot.dataset.ref, dot);
-    else if (pebble) light(pebble.dataset.stoneId, null, pebble);
+    else if (stoneBtn) light(stoneBtn.dataset.stoneId, null, stoneBtn);
   };
   const jumpTo = (stoneId, ref) => {
     state.mapOpen = false;
@@ -151,7 +218,7 @@ function renderMap() {
   const inner = mapEl.querySelector('.map-inner');
   if (!touchOnly) inner.addEventListener('mouseover', onPoint);
   inner.addEventListener('focusin', onPoint);
-  if (!touchOnly) mapEl.querySelectorAll('.map-dots, .map-stones').forEach(el => el.addEventListener('mouseleave', clear));
+  if (!touchOnly) mapEl.querySelectorAll('.map-dots, .map-stones, .map-stone-dots').forEach(el => el.addEventListener('mouseleave', clear));
   clear();
   // A preview floating beside a dot would be left behind by scrolling
   mapEl.onscroll = () => { if (!touchOnly && litKey) clear(); };
@@ -165,7 +232,7 @@ function renderMap() {
       jumpTo(null, ref);
     });
   });
-  mapEl.querySelectorAll('.stone-ellipse').forEach(el => {
+  mapEl.querySelectorAll('[data-stone-id]').forEach(el => {
     el.addEventListener('click', () => {
       const stoneId = el.getAttribute('data-stone-id');
       if (touchOnly && litKey !== `s:${stoneId}`) { light(stoneId, null, el); return; }

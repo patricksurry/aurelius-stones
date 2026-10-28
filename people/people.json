@@ -68,6 +68,6 @@
     {"id": "hipparchus", "wiki": "Hipparchus", "forms": ["Hipparchus"]},
     {"id": "eudoxus", "wiki": "Eudoxus of Cnidus", "forms": ["Eudoxus"]},
     {"id": "pindar", "wiki": "Pindar", "forms": ["Pindar"]},
-    {"id": "charax", "wiki": "Aulus Claudius Charax", "forms": ["Charax"]}
+    {"id": "charax", "wiki": "Aulus Claudius Charax", "forms": ["Charax"], "description": "2nd-century AD Roman senator and historian"}
   ]
 }

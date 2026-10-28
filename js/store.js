@@ -41,7 +41,8 @@ function refFromHash(readSet) {
 }
 
 // theme: 'system' follows the machine; 'day' or 'night' once you choose
-const prefs = { theme: 'system', greek: false, ...load('meditations_prefs_v1', {}) };
+// mapView: 'stones' (the 48 stones grouped by theme with their passage ribbons) or 'books' (12 books + stone pebbles)
+const prefs = { theme: 'system', greek: false, mapView: 'stones', ...load('meditations_prefs_v1', {}) };
 const initialRead = new Set(load('meditations_read_v1', []));
 const savedRef = load('meditations_pos_v1', 'I.1');
 const hashRef = refFromHash(initialRead);
@@ -134,7 +135,9 @@ function isClaimed(stoneId) {
   const stone = STONE_BY_ID[stoneId];
   if (!stone) return false;
   const c = state.claimed[stoneId];
-  return Boolean(c && c.maxim && c.maxim.trim() && c.maxim.trim() !== stone.defaultMaxim);
+  if (!c) return false;
+  if (typeof c.claimed === 'boolean') return c.claimed;
+  return Boolean(c.maxim && c.maxim.trim() && c.maxim.trim() !== stone.defaultMaxim);
 }
 
 function getStoneHeadline(stone) {

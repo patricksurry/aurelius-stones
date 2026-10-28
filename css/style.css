@@ -187,12 +187,46 @@ body:not(.map-seen) .progress-caption {
   border-radius: 26px 30px 24px 28px;
   padding: 2.75rem var(--pad-x) 1.5rem;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.035);
-  transition: background 0.35s ease, border-color 0.35s ease, opacity 0.22s ease;
+  transition: background 0.35s ease, border-color 0.35s ease, opacity 0.36s ease, transform 0.44s cubic-bezier(0.25, 0.85, 0.3, 1);
   position: relative;
 }
 
-.stone.fading {
+.stone.fading,
+.related.fading,
+body.idle .related.fading {
   opacity: 0;
+}
+
+.stone.slide-out-left,
+.related.slide-out-left,
+body.idle .related.slide-out-left {
+  opacity: 0;
+  transform: translateX(-42px);
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+.stone.slide-out-right,
+.related.slide-out-right,
+body.idle .related.slide-out-right {
+  opacity: 0;
+  transform: translateX(42px);
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+.stone.slide-in-left,
+.related.slide-in-left,
+body.idle .related.slide-in-left {
+  opacity: 0;
+  transform: translateX(-42px);
+  transition: none;
+}
+
+.stone.slide-in-right,
+.related.slide-in-right,
+body.idle .related.slide-in-right {
+  opacity: 0;
+  transform: translateX(42px);
+  transition: none;
 }
 
 .stone.claimed {
@@ -211,6 +245,7 @@ body:not(.map-seen) .progress-caption {
   font-weight: 400;
   color: var(--ink-mid);
   font-style: italic;
+  cursor: text;
   transition: color 0.25s ease;
 }
 
@@ -246,6 +281,7 @@ body:not(.map-seen) .progress-caption {
   font-size: 0.96rem;
   font-style: italic;
   color: var(--ink-faint);
+  transition: opacity 0.25s ease;
 }
 
 .suggested .quiet-btn {
@@ -254,8 +290,13 @@ body:not(.map-seen) .progress-caption {
   text-decoration: underline dotted;
 }
 
-.suggested[hidden] {
-  display: none;
+.suggested.unearned {
+  opacity: 0;
+}
+
+.maxim-wrap:hover .suggested.unearned,
+.maxim-wrap:focus-within .suggested.unearned {
+  opacity: 1;
 }
 
 /* The offer arrives slowly, the moment it's earned */
@@ -355,30 +396,36 @@ body.show-greek .verse {
   margin-top: 0;
 }
 
+.verse-clip {
+  display: flex;
+  flex-direction: column;
+}
+
 /* The ˄ ˅ hang in the left margin, under the ‹, so every line of text shares one left edge */
 .neighbor {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0;
   width: calc(100% + 1.5rem);
   margin-left: -1.5rem;
   background: none;
   border: none;
-  padding: 0.35rem 0;
+  padding: 0.25rem 0;
   text-align: left;
   font-family: var(--font);
   font-size: 1.05rem;
+  line-height: 1.48;
   color: var(--ink-faint);
   cursor: pointer;
   transition: color 0.2s ease, opacity 0.9s ease;
 }
 
 .neighbor.prev {
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.65rem;
 }
 
 .neighbor.next {
-  margin-top: 0.6rem;
+  margin-top: 0.65rem;
 }
 
 .neighbor:hover:not(:disabled) {
@@ -388,21 +435,69 @@ body.show-greek .verse {
 /* First or last on the stone: the arrow goes, but keeps its place so the passage doesn't shift */
 .neighbor:disabled {
   visibility: hidden;
+  min-height: 3.25rem;
 }
 
 .neighbor svg {
   flex: 0 0 1.5rem;
   width: 1.5rem;
   height: 12px;
-  align-self: center;
 }
 
-.neighbor-text {
+.neighbor.prev svg {
+  align-self: flex-end;
+  margin-bottom: 0.25rem;
+}
+
+.neighbor.next svg {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+}
+
+/* Clipped glimpse of the adjacent passage: closing lines for prev, opening lines for next */
+.neighbor-clip {
   flex: 1;
   min-width: 0;
-  white-space: nowrap;
+  height: 2.75rem;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+}
+
+.neighbor.prev .neighbor-clip {
+  justify-content: flex-end;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 42%, #000 88%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 42%, #000 88%);
+}
+
+.neighbor.next .neighbor-clip {
+  justify-content: flex-start;
+  -webkit-mask-image: linear-gradient(to bottom, #000 12%, rgba(0, 0, 0, 0.5) 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 12%, rgba(0, 0, 0, 0.5) 58%, transparent 100%);
+}
+
+.neighbor-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: baseline;
+}
+
+body.show-greek .neighbor-body {
+  grid-template-columns: 1fr 1fr;
+}
+
+.neighbor-english {
+  max-width: 38em;
+}
+
+.neighbor-greek {
+  display: none;
+  color: var(--ink-greek);
+}
+
+body.show-greek .neighbor-greek {
+  display: block;
 }
 
 .verse-english {
@@ -535,7 +630,8 @@ body.idle .chrome.revealed {
 /* Quiet small-caps labels, same voice as the book marker */
 .lens {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .lens .quiet-btn {
@@ -546,11 +642,6 @@ body.idle .chrome.revealed {
 
 .lens .quiet-btn.on {
   color: var(--ink);
-}
-
-.lens {
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .lens .lens-icon {
@@ -637,6 +728,70 @@ body.idle .chrome.revealed {
   margin-bottom: 2rem;
 }
 
+.study-verse-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.study-verse.active {
+  margin: 0.45rem 0 0.65rem;
+  padding: 0.65rem 0 0.75rem 0.9rem;
+  border-left: 2px solid var(--stone-fill-claimed);
+}
+
+.study-verse.active .study-verse-head {
+  margin-bottom: 0.25rem;
+}
+
+.study-verse.active .verse {
+  margin-top: 0;
+}
+
+.study-verse.active .verse-english,
+.study-verse.active .verse-greek {
+  font-size: 1.12rem;
+  line-height: 1.62;
+}
+
+.study-verse-line {
+  display: grid;
+  grid-template-columns: 3.1rem 1fr;
+  align-items: baseline;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.22rem 0;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font);
+  font-size: 1rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.study-verse-line:hover {
+  color: var(--ink);
+}
+
+.study-verse-ref {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+
+.study-verse-line.read .study-verse-ref {
+  color: var(--ink-mid);
+}
+
+.study-verse-incipit {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .study-head {
   font-size: 0.8rem;
   font-weight: 400;
@@ -718,6 +873,7 @@ body.idle .chrome-soft:not(:hover) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.9rem;
+  transition: opacity 0.36s ease, transform 0.44s cubic-bezier(0.25, 0.85, 0.3, 1);
 }
 
 .mini-stone {
@@ -1027,8 +1183,13 @@ body.idle .chrome-soft:not(:hover) {
 }
 
 .map-dots.dim .map-dot:not(.lit),
-.map-stones.dim .stone-ellipse:not(.lit) {
+.map-stones.dim .stone-ellipse:not(.lit),
+.map-stones-themes.dim .map-stone-item:not(.lit) {
   opacity: 0.35;
+}
+
+.map-stone-item {
+  transition: opacity 0.2s ease;
 }
 
 .map-dot,
@@ -1041,6 +1202,109 @@ body.idle .chrome-soft:not(:hover) {
   font-size: 0.85rem;
   color: var(--ink-faint);
   letter-spacing: 0.06em;
+}
+
+.map-view-toggle {
+  margin-right: 0.35rem;
+  font-style: italic;
+}
+
+.map-view-toggle .quiet-btn {
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+.map-view-toggle .quiet-btn.on {
+  color: var(--ink);
+  text-decoration: underline dotted;
+}
+
+/* Compact list view of the 48 stones grouped in 3 themes */
+.map-stones-themes {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.map-theme-head {
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-faint) 22%, transparent);
+}
+
+.map-theme-head .map-theme {
+  font-size: 0.98rem;
+  font-style: italic;
+  color: var(--ink);
+}
+
+.map-theme-hint {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.map-stone-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem 1.75rem;
+}
+
+.map-stone-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.map-stone-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink-mid);
+  font-family: var(--font);
+}
+
+.map-stone-row .stone-ellipse {
+  flex-shrink: 0;
+  width: 14px;
+  height: 9px;
+  transform: translateY(1px);
+}
+
+.map-stone-row .stone-ellipse.current {
+  width: 17px;
+  height: 11px;
+}
+
+.map-stone-maxim {
+  font-size: 0.98rem;
+  line-height: 1.32;
+  font-style: italic;
+  color: var(--ink-mid);
+  transition: color 0.2s ease;
+}
+
+.map-stone-maxim.claimed {
+  font-style: normal;
+  color: var(--ink);
+}
+
+.map-stone-row:hover .map-stone-maxim {
+  color: var(--ink);
+}
+
+.map-stone-dots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding-left: calc(14px + 0.55rem);
 }
 
 .map-stones {
@@ -1208,6 +1472,9 @@ body.idle .chrome-soft:not(:hover) {
   .progress-caption {
     opacity: 0.75;
   }
+  .suggested.unearned {
+    opacity: 0.75;
+  }
 }
 
 @media (max-width: 680px) {
@@ -1228,11 +1495,13 @@ body.idle .chrome-soft:not(:hover) {
   .stone {
     padding: 1.75rem var(--pad-x) 1.25rem;
   }
-  body.show-greek .verse {
+  body.show-greek .verse,
+  body.show-greek .neighbor-body {
     grid-template-columns: 1fr;
     gap: 0.65rem;
   }
-  .related {
+  .related,
+  .map-stone-list {
     grid-template-columns: 1fr;
   }
 }

@@ -1,6 +1,6 @@
 # People
 
-Marcus names about a hundred people. Of those, 67 are linked: each is marked with a faint dotted underline in the passage and listed under "People in this passage" on the study side, with a one-line description and a link to their English Wikipedia article.
+Marcus names about a hundred people. Of those, 68 are linked: each is marked with a faint dotted underline in the passage and listed under "People in this passage" on the study side, with a one-line description and a link to their English Wikipedia article.
 
 ## How the list was made
 

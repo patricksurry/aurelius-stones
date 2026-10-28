@@ -10,46 +10,229 @@ function toggleGreek() {
   if (btn) btn.classList.toggle('on', prefs.greek);
 }
 
-function goToVerse(ref, fromHistory = false, toStudy = false) {
+let rollTimer = null;
+
+function animateStoneRoll(surface, dir, prevMetrics) {
+  const passage = surface.querySelector('.passage');
+  const track = passage && passage.querySelector('.passage-track');
+  const verseClip = passage && passage.querySelector('.verse-current .verse-clip');
+  const verseEl = passage && passage.querySelector('.verse-current .verse');
+  const headEl = passage && passage.querySelector('.verse-current .verse-head');
+  const outNeighbor = passage && passage.querySelector(dir > 0 ? '.neighbor.prev' : '.neighbor.next');
+  const outClip = outNeighbor && outNeighbor.querySelector('.neighbor-clip');
+  const outBody = outNeighbor && outNeighbor.querySelector('.neighbor-body');
+  const inNeighbor = passage && passage.querySelector(dir > 0 ? '.neighbor.next' : '.neighbor.prev');
+  const inClip = inNeighbor && inNeighbor.querySelector('.neighbor-clip');
+  if (!passage || !track || !verseClip || !verseEl) return;
+
+  clearTimeout(rollTimer);
+  const newPassageH = passage.offsetHeight;
+  const newVerseH = verseEl.offsetHeight;
+  const neighH = (outClip && outClip.offsetHeight) || (inClip && inClip.offsetHeight) || 44;
+  const origin = dir > 0 ? 'left top' : 'left bottom';
+
+  // Lock the passage container to its previous height so the stone's bottom edge
+  // and footer stones resize smoothly instead of jumping at frame 0
+  passage.style.transition = 'none';
+  passage.style.height = `${prevMetrics.passageH}px`;
+  passage.style.clipPath = 'inset(0 -3.5rem 0 -2rem)';
+
+  // Anchor the incoming verse to the edge that was already visible in its glimpse
+  // (bottom edge when pulling down from prev, top edge when pulling up from next)
+  // and use GPU scale + partial opacity instead of font-size so text never re-wraps mid-scroll
+  verseClip.style.transition = 'none';
+  verseClip.style.justifyContent = dir > 0 ? 'flex-start' : 'flex-end';
+  verseClip.style.height = `${Math.min(prevMetrics.targetH || neighH, newVerseH)}px`;
+  verseClip.style.overflow = 'hidden';
+
+  verseEl.style.transition = 'none';
+  verseEl.style.opacity = '0.28';
+  verseEl.style.transformOrigin = origin;
+  verseEl.style.transform = 'scale(0.92)';
+
+  if (outClip && outBody && outNeighbor) {
+    outClip.style.transition = 'none';
+    outClip.style.height = `${Math.max(neighH, prevMetrics.verseH)}px`;
+    outNeighbor.style.transition = 'none';
+    outNeighbor.style.color = 'var(--ink-mid)';
+    outBody.style.transition = 'none';
+    outBody.style.opacity = '0.88';
+    outBody.style.transformOrigin = origin;
+    outBody.style.transform = 'scale(1.06)';
+  }
+  if (inNeighbor) {
+    inNeighbor.style.transition = 'none';
+    inNeighbor.style.opacity = '0';
+  }
+  if (headEl) {
+    headEl.style.transition = 'none';
+    headEl.style.opacity = '0';
+  }
+
+  // FLIP: align the incoming verse with the exact screen Y where its preview sat before render()
+  track.style.transition = 'none';
+  track.style.transform = 'translateY(0)';
+  track.style.opacity = '0.45';
+  const newTargetTop = verseClip.getBoundingClientRect().top;
+  const shiftY = prevMetrics.targetTop != null ? (prevMetrics.targetTop - newTargetTop) : (dir > 0 ? 54 : -76);
+  track.style.transform = `translateY(${shiftY}px)`;
+
+  positionPager();
+  void passage.offsetHeight;
+
+  // Scale duration with the vertical travel and stone height change so large resizes
+  // glide at roughly the same physical rate as small ones, with a gentle acceleration out of rest
+  const heightDelta = Math.abs(newPassageH - prevMetrics.passageH);
+  const scrollDelta = Math.max(Math.abs(newVerseH - neighH), Math.abs(prevMetrics.verseH - neighH));
+  const effectiveDelta = Math.max(heightDelta, scrollDelta * 0.75);
+  const dur = Math.round(Math.min(1150, Math.max(430, 380 + effectiveDelta * 1.45)));
+  const fadeDur = Math.round(dur * 0.75);
+  const fadeDelay = Math.round(dur * 0.2);
+  const ease = `${dur}ms cubic-bezier(0.42, 0.08, 0.22, 1)`;
+
+  passage.style.transition = `height ${ease}`;
+  passage.style.height = `${newPassageH}px`;
+
+  track.style.transition = `transform ${ease}, opacity ${fadeDur}ms ease`;
+  track.style.transform = 'translateY(0)';
+  track.style.opacity = '1';
+
+  verseClip.style.transition = `height ${ease}`;
+  verseClip.style.height = `${newVerseH}px`;
+  verseEl.style.transition = `opacity ${fadeDur}ms ease, transform ${ease}`;
+  verseEl.style.opacity = '1';
+  verseEl.style.transform = 'scale(1)';
+
+  if (outClip && outBody && outNeighbor) {
+    outClip.style.transition = `height ${ease}`;
+    outClip.style.height = `${neighH}px`;
+    outNeighbor.style.transition = `color ${ease}`;
+    outNeighbor.style.color = '';
+    outBody.style.transition = `opacity ${fadeDur}ms ease, transform ${ease}`;
+    outBody.style.opacity = '1';
+    outBody.style.transform = 'scale(1)';
+  }
+  if (inNeighbor) {
+    inNeighbor.style.transition = `opacity ${fadeDur}ms ease ${fadeDelay}ms`;
+    inNeighbor.style.opacity = '';
+  }
+  if (headEl) {
+    headEl.style.transition = `opacity ${fadeDur}ms ease ${fadeDelay}ms`;
+    headEl.style.opacity = '1';
+  }
+
+  // Keep the right-margin dot ribbon gliding with the verse as it scrolls and resizes
+  const t0 = performance.now();
+  const syncPager = (now) => {
+    positionPager();
+    if (now - t0 < dur + 20) requestAnimationFrame(syncPager);
+  };
+  requestAnimationFrame(syncPager);
+
+  rollTimer = setTimeout(() => {
+    passage.style.transition = '';
+    passage.style.height = '';
+    passage.style.clipPath = '';
+    track.style.transition = '';
+    track.style.transform = '';
+    track.style.opacity = '';
+    verseClip.style.transition = '';
+    verseClip.style.height = '';
+    verseClip.style.overflow = '';
+    verseClip.style.justifyContent = '';
+    verseEl.style.transition = '';
+    verseEl.style.opacity = '';
+    verseEl.style.transform = '';
+    verseEl.style.transformOrigin = '';
+    if (outClip && outBody && outNeighbor) {
+      outClip.style.transition = '';
+      outClip.style.height = '';
+      outNeighbor.style.transition = '';
+      outBody.style.transition = '';
+      outBody.style.opacity = '';
+      outBody.style.transform = '';
+      outBody.style.transformOrigin = '';
+    }
+    if (inNeighbor) {
+      inNeighbor.style.transition = '';
+    }
+    if (headEl) { headEl.style.transition = ''; headEl.style.opacity = ''; }
+    positionPager();
+    if (passage.getBoundingClientRect().top < 0) passage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, dur + 20);
+}
+
+function goToVerse(ref, fromHistory = false, toStudy = false, linearDelta = 0) {
   const vObj = VERSE_BY_ID[ref];
   if (!vObj || (vObj.id === state.currentVerseRef && state.flipped === toStudy)) return;
+  const oldRef = state.currentVerseRef;
   const newStone = vObj.stoneId !== state.currentStoneId;
   state.currentVerseRef = vObj.id;
   state.currentStoneId = vObj.stoneId;
   const wasFlipped = state.flipped;
   state.flipped = toStudy;
-  // Clear the old stone's neighbours at once, so they never linger beside the new stone
-  if (newStone) document.getElementById('relatedRow').innerHTML = '';
   store('meditations_pos_v1', vObj.id);
   if (!fromHistory) {
-    const fn = (history.state && (history.state.map || history.state.study)) ? 'replaceState' : 'pushState';
-    history[fn]({ ref: vObj.id }, '', `#${vObj.id}`);
+    const fn = (history.state && (history.state.map || history.state.study !== toStudy)) ? 'replaceState' : 'pushState';
+    history[fn](toStudy ? { ref: vObj.id, study: true } : { ref: vObj.id }, '', `#${vObj.id}`);
   }
 
   const surface = document.getElementById('stoneSurface');
+  const related = document.getElementById('relatedRow');
   const oldPassage = surface.querySelector('.passage');
 
-  // Paging within a stone: only the passage crossfades; the stone stays put
+  // Paging within a stone (including ←/→ when the next/prev book verse is on this same stone):
+  // scroll the strip vertically while shrinking the outgoing verse and expanding the incoming one
   if (!newStone && !wasFlipped && !toStudy && oldPassage) {
-    oldPassage.classList.add('fading');
-    setTimeout(() => {
-      state.verseEntering = true;
-      render();
-      state.verseEntering = false;
-      const fresh = surface.querySelector('.passage');
-      requestAnimationFrame(() => requestAnimationFrame(() => fresh.classList.remove('fading')));
-      if (fresh.getBoundingClientRect().top < 0) fresh.scrollIntoView({ behavior: 'smooth' });
-    }, 220);
+    const ids = STONE_BY_ID[state.currentStoneId].verseIds;
+    const dir = ids.indexOf(vObj.id) >= ids.indexOf(oldRef) ? 1 : -1;
+    const oldVerseEl = oldPassage.querySelector('.verse-current .verse');
+    const targetClip = oldPassage.querySelector(dir > 0 ? '.neighbor.next .neighbor-clip' : '.neighbor.prev .neighbor-clip');
+    const prevMetrics = {
+      passageH: oldPassage.offsetHeight,
+      verseH: oldVerseEl ? oldVerseEl.offsetHeight : 80,
+      targetH: targetClip ? targetClip.offsetHeight : 44,
+      targetTop: targetClip ? targetClip.getBoundingClientRect().top : null
+    };
+    render();
+    animateStoneRoll(surface, dir, prevMetrics);
     return;
   }
 
-  // Moving to another stone: the whole stone crossfades
+  // Moving to another stone in book order (←/→ or swipe left/right): slide the stone and footer stones horizontally
+  if (newStone && linearDelta) {
+    const outCls = linearDelta > 0 ? 'slide-out-left' : 'slide-out-right';
+    const inCls = linearDelta > 0 ? 'slide-in-right' : 'slide-in-left';
+    surface.classList.add(outCls);
+    if (related) related.classList.add(outCls);
+    setTimeout(() => {
+      render();
+      surface.classList.remove(outCls);
+      surface.classList.add(inCls);
+      if (related) {
+        related.classList.remove(outCls);
+        related.classList.add(inCls);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        surface.classList.remove(inCls);
+        if (related) related.classList.remove(inCls);
+      }));
+    }, 300);
+    return;
+  }
+
+  // Moving to another stone from the map / related stones (or switching passage on the study side): crossfade
   surface.classList.add('fading');
+  if (newStone && related) related.classList.add('fading');
   setTimeout(() => {
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    requestAnimationFrame(() => surface.classList.remove('fading'));
-  }, 220);
+    requestAnimationFrame(() => {
+      surface.classList.remove('fading');
+      if (related) related.classList.remove('fading');
+    });
+  }, 320);
 }
 
 // Enter a stone at its first unread passage
@@ -63,26 +246,32 @@ function goToStone(stoneId) {
 function stepLinear(delta) {
   const idx = VERSES.findIndex(v => v.id === state.currentVerseRef);
   const target = VERSES[idx + delta];
-  if (target) goToVerse(target.id);
+  if (target) goToVerse(target.id, false, false, delta);
 }
 
 // Through the passages resting on the current stone, stopping at either end
 function stepStone(delta) {
   const ids = STONE_BY_ID[state.currentStoneId].verseIds;
   const target = ids[ids.indexOf(state.currentVerseRef) + delta];
-  if (target) goToVerse(target);
+  if (target) goToVerse(target, false, state.flipped);
+}
+
+function focusPerson(personId) {
+  const entry = personId && document.querySelector(`.person-entry[data-person="${personId}"]`);
+  if (!entry) return false;
+  document.querySelectorAll('.person-entry.focused').forEach(el => el.classList.remove('focused'));
+  entry.classList.add('focused');
+  entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return true;
 }
 
 function flipStone(personId) {
+  if (state.flipped && personId && focusPerson(personId)) return;
   state.flipped = !state.flipped;
   if (state.flipped) history.pushState({ ref: state.currentVerseRef, study: true }, '', `#${state.currentVerseRef}`);
   else history.replaceState({ ref: state.currentVerseRef }, '', `#${state.currentVerseRef}`);
   render();
-  const entry = personId && document.querySelector(`.person-entry[data-person="${personId}"]`);
-  if (entry) {
-    entry.classList.add('focused');
-    entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } else {
+  if (!focusPerson(personId)) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
@@ -90,10 +279,10 @@ function flipStone(personId) {
 // =====================================================
 // READING: EARN PROGRESS BY DWELLING ON THE PASSAGE
 // Time accrues on both sides of the stone while the page
-// is visible and focused and the map is closed.
+// is visible and the map is closed.
 // =====================================================
 function readThresholdMs(verse) {
-  const words = verse.english.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length;
+  const words = verse.english.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length;
   return Math.max(READ_MIN_MS, (words / READ_WPM) * 60000);
 }
 
@@ -137,7 +326,7 @@ setInterval(() => {
     return;
   }
   if (state.read.has(dwell.ref)) return;
-  if (document.hidden || !document.hasFocus() || state.mapOpen || !document.getElementById('welcome').hidden) return;
+  if (document.hidden || state.mapOpen || !document.getElementById('welcome').hidden) return;
   dwell.ms += dt;
   const threshold = readThresholdMs(VERSE_BY_ID[dwell.ref]);
   // As the passage is read, its dot in the pager slowly fills in
@@ -199,19 +388,30 @@ stoneEl.addEventListener('click', (e) => {
   if (person) flipStone(person.dataset.person);
 });
 
-// Touch swipe left / right on the stone steps through the book in Marcus's order
+// Touch: swipe left/right steps through the book; swipe up/down steps through this stone
 let swipeStart = null;
 stoneEl.addEventListener('touchstart', (e) => {
   if (e.touches.length !== 1 || e.target.tagName === 'TEXTAREA') { swipeStart = null; return; }
-  swipeStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  swipeStart = {
+    x: e.touches[0].clientX,
+    y: e.touches[0].clientY,
+    atTop: window.scrollY <= 8,
+    atBottom: window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8,
+    onNeighbor: Boolean(e.target.closest('.neighbor'))
+  };
 }, { passive: true });
 stoneEl.addEventListener('touchend', (e) => {
   if (!swipeStart || state.flipped || e.changedTouches.length !== 1) return;
   const dx = e.changedTouches[0].clientX - swipeStart.x;
   const dy = e.changedTouches[0].clientY - swipeStart.y;
+  const { atTop, atBottom, onNeighbor } = swipeStart;
   swipeStart = null;
-  if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 2 && !window.getSelection()?.toString()) {
+  if (window.getSelection()?.toString()) return;
+  if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.8) {
     stepLinear(dx < 0 ? 1 : -1);
+  } else if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx) * 1.6) {
+    if (dy < 0 && (atBottom || onNeighbor)) stepStone(1);
+    else if (dy > 0 && (atTop || onNeighbor)) stepStone(-1);
   }
 }, { passive: true });
 
@@ -249,8 +449,8 @@ window.addEventListener('keydown', (e) => {
   wake();
   if (e.key === 'ArrowLeft') stepLinear(-1);
   if (e.key === 'ArrowRight') stepLinear(1);
-  if (e.key === 'ArrowUp' && !state.flipped) { e.preventDefault(); stepStone(-1); }
-  if (e.key === 'ArrowDown' && !state.flipped) { e.preventDefault(); stepStone(1); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); stepStone(-1); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); stepStone(1); }
   if (e.key === 'f') flipStone();
   if (e.key === 'g') toggleGreek();
   if (e.key === 'm') toggleMap();

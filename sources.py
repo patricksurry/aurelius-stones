@@ -39,6 +39,7 @@ def load_long():
         lo = starts[b] + 1
         hi = starts.get(b + 1, end)
         sections, current, para = {}, "1", []
+        in_footnote = False
 
         def flush():
             if para:
@@ -47,10 +48,23 @@ def load_long():
                 para.clear()
 
         for ln in lines[lo:hi]:
-            if ln.startswith("    "):  # Long's indented footnotes
+            if not ln.strip():
                 flush()
                 continue
-            if not ln.strip():
+            # Footnotes start with [A], [B], ... (usually indented by 4 spaces,
+            # though three after VII.45 are unindented) and may continue for
+            # several indented paragraphs. Verse quotations are also indented,
+            # so only skip indented lines while inside a footnote block.
+            if re.match(r"^\s*\[[A-Z]\]\s", ln):
+                flush()
+                in_footnote = True
+                continue
+            if not ln.startswith(" "):
+                in_footnote = False
+            if in_footnote:
+                continue
+            # Skip Gutenberg's illustration captions and Long's right-aligned verse source lines
+            if re.match(r"^\[Illustration:.*\]$", ln.strip()) or ln.startswith(" " * 15):
                 flush()
                 continue
             m = re.match(r"^(\d+)\.\s+(.*)", ln)
@@ -65,6 +79,7 @@ def load_long():
         clean = {}
         for k, v in sections.items():
             v = re.sub(r"\[[A-Z]\]", "", v)            # footnote markers
+            v = re.sub(r"\s*\+", "", v)                # Long's obelus (+) for corrupt Greek
             v = re.sub(r"\s+", " ", v).strip()
             clean[k] = v
         books[b] = clean
@@ -79,14 +94,17 @@ def load_long():
 
 
 def _chapters(spec):
-    """'4–5' -> {4, 5};  '9, 12 and 14' -> {9, 12, 14};  '36, 42–43' -> {36, 42, 43}."""
+    """'4–5' -> {4, 5}; '25–6' -> {25, 26}; '9, 12 and 14' -> {9, 12, 14}."""
     chapters = set()
     for part in re.split(r",|\band\b", spec):
-        nums = [int(n) for n in re.findall(r"\d+", part)]
+        nums = re.findall(r"\d+", part)
         if len(nums) == 2 and re.search(r"[–-]", part):
-            chapters.update(range(nums[0], nums[1] + 1))
+            lo, hi_s = int(nums[0]), nums[1]
+            # Expand Oxford-style elided ranges such as '25–6' -> 25..26 or '32–7' -> 32..37
+            hi = int(nums[0][:-len(hi_s)] + hi_s) if int(hi_s) < lo and len(nums[0]) > len(hi_s) else int(hi_s)
+            chapters.update(range(lo, hi + 1))
         else:
-            chapters.update(nums)
+            chapters.update(int(n) for n in nums)
     return chapters
 
 
@@ -103,15 +121,20 @@ def load_commentary():
         paras = [re.sub(r"\s+", " ", p).strip() for p in text.split("\n")]
         paras = [p for p in paras if p]
 
-        # Body runs from the "BOOK N" heading to the footnotes (lines starting with ↑)
+        # Body runs from the "BOOK N" heading to the footnotes section ("Footnotes[edit]" or lines starting with ↑)
         start = next(i for i, p in enumerate(paras) if re.fullmatch(r"BOOK [IVX]+", p)) + 1
-        end = next((i for i, p in enumerate(paras) if p.startswith("↑")), len(paras))
+        end = next((i for i, p in enumerate(paras) if p.startswith("↑") or p == "Footnotes[edit]"), len(paras))
 
         intro, notes = [], []
         for p in paras[start:end]:
-            m = re.match(r"^(Chs?\.\s*([\d–\-,\s]+(?:and\s+\d+)?)\.)\s*(.*)", p)
+            # Wikisource has three OCR commas ('Ch, 29.', 'Ch, 8.', 'Ch, 32.'); accept both '.' and ','
+            m = re.match(r"^(Chs?[.,]\s*([\d–\-,\s]+(?:and\s+\d+)?)\.)\s*(.*)", p)
             if m:
-                notes.append({"label": m.group(1), "chapters": sorted(_chapters(m.group(2))), "paragraphs": [m.group(3)]})
+                label = re.sub(r"^(Chs?),", r"\1.", m.group(1))
+                chapters = sorted(_chapters(m.group(2)))
+                if b == 5 and chapters == [36]:
+                    chapters = [36, 37]  # Leopold splits V.36 into V.36–37; Farquharson's note covers both
+                notes.append({"label": label, "chapters": chapters, "paragraphs": [m.group(3)]})
             elif notes:
                 notes[-1]["paragraphs"].append(p)
             else:
