@@ -900,6 +900,7 @@ body.idle .chrome-soft:not(:hover) {
 .map-dots {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.45rem;
 }
 
@@ -924,9 +925,10 @@ body.idle .chrome-soft:not(:hover) {
   border-color: var(--ink-mid);
 }
 
+/* Where you are: a slightly larger dot, as in the pager */
 .map-dot.current {
-  outline: 1px solid var(--ink);
-  outline-offset: 2px;
+  width: 10px;
+  height: 10px;
 }
 
 /* What you're pointing at: a passage's opening, or a stone's maxim */
@@ -1058,6 +1060,7 @@ body.idle .chrome-soft:not(:hover) {
 .map-pebbles {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.7rem;
 }
 
@@ -1082,9 +1085,10 @@ body.idle .chrome-soft:not(:hover) {
   border-color: var(--stone-fill-claimed);
 }
 
+/* The stone you're on: a slightly larger stone */
 .stone-ellipse.current {
-  outline: 1px solid var(--ink);
-  outline-offset: 2px;
+  width: 23px;
+  height: 15px;
 }
 
 /* Today's stone: a small warm mark beneath it */
