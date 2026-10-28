@@ -13,7 +13,7 @@ This app gathers the 488 passages of *Meditations* onto 48 *touchstones* (stones
 grouped by the three themes.
 
 Rather than reading linearly, the app encourages you to reflect on one or more passages
-belonging to a stone and make it your own by rewriting the summary and adding personal notes.
+belonging to a stone and make it your own by rewriting the summary and adding reflections.
 Each stone also has study notes: A. S. L. Farquharson's commentary,
 George Long's translation, and the historical figures Marcus mentions; the original Greek can sit alongside the English.
 A passage counts as read only after you've spent time with it.

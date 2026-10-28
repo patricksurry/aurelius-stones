@@ -1,4 +1,4 @@
-// The stone card: its passage, neighbours, headline (yours to claim) and notes, the study side,
+// The stone card: its passage, neighbours, headline (yours to claim) and reflections, the study side,
 // and the related stones beneath it.
 
 // Top corner: stones you've made your own and passages you've read; opens the map
@@ -124,7 +124,7 @@ function render() {
       <div class="divider"></div>
 
       <textarea id="reflectionField" class="reflection-input" rows="1"
-                placeholder="Notes…">${escapeHtml(user.reflection || '')}</textarea>
+                placeholder="Reflections…">${escapeHtml(user.reflection || '')}</textarea>
 
       <div class="card-foot">
         <div class="pager-dots chrome">
