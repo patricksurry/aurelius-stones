@@ -56,7 +56,11 @@ let state = {
   claimed: load('meditations_full_v1', {}),
   read: initialRead,
   // When progress was last cleared, so a clear reaches your other devices
-  cleared: load('meditations_cleared_v1', 0)
+  cleared: load('meditations_cleared_v1', 0),
+  // Your shared snapshot, if any: { key, t }, with key null once you stop sharing (synced like progress)
+  share: load('meditations_share_v1', null),
+  // Someone's shared snapshot this link opened (?k=…): { key, stones }, fetched by sync.js
+  baseline: load('meditations_baseline_v1', null)
 };
 
 function save() {
@@ -69,7 +73,7 @@ function save() {
 // which is why an un-claimed stone keeps an entry with its time (t).
 // A newer clear wipes everything older on either side.
 function progressSnapshot() {
-  return { claimed: state.claimed, read: [...state.read], cleared: state.cleared };
+  return { claimed: state.claimed, read: [...state.read], cleared: state.cleared, share: state.share };
 }
 
 function mergeProgress(remote) {
@@ -85,6 +89,10 @@ function mergeProgress(remote) {
   for (const [id, theirs] of Object.entries(remote.claimed || {})) {
     const ours = state.claimed[id];
     if (STONE_BY_ID[id] && (!ours || (theirs.t || 0) > (ours.t || 0))) { state.claimed[id] = theirs; changed = true; }
+  }
+  if (remote.share && remote.share.t > ((state.share && state.share.t) || 0)) {
+    setShare(remote.share);
+    changed = true;
   }
   if (changed) {
     store('meditations_full_v1', state.claimed);
@@ -112,7 +120,7 @@ function clearProgress() {
 // mode: 'idle', 'email' (asking for an address) or 'confirm' (finishing a link opened elsewhere)
 const account = {
   ready: false, user: null, mode: 'idle', note: '',
-  signIn: null, sendLink: null, confirm: null, signOut: null
+  signIn: null, sendLink: null, confirm: null, signOut: null, share: null, unshare: null
 };
 
 // Today's stone: the same for everyone on a given (local) day. Stepping by 17, which shares
@@ -142,7 +150,69 @@ function isClaimed(stoneId) {
 
 function getStoneHeadline(stone) {
   const c = state.claimed[stone.id];
-  return (c && c.maxim && c.maxim.trim()) ? c.maxim : stone.defaultMaxim;
+  return (isClaimed(stone.id) && c.maxim.trim()) ? c.maxim : suggestedMaxim(stone);
+}
+
+// SHARING. Sharing publishes a snapshot of the stones you've claimed and your reflections
+// (not what you've read) at shared/{key}, and puts ?k={key} in your address, so any link you copy
+// carries it. Opening such a link makes that snapshot the baseline: its maxims become the suggested
+// ones and its reflections show beside your own, while what you claim or write stays yours.
+
+function linkKey() {
+  return new URLSearchParams(location.search).get('k');
+}
+
+// The snapshot this page is showing as its baseline, unless it's your own
+function sharedStones() {
+  const k = linkKey();
+  const b = state.baseline;
+  return (k && b && b.key === k && k !== (state.share && state.share.key)) ? b.stones : null;
+}
+
+function sharedEntry(stone) {
+  const stones = sharedStones();
+  return (stones && stones[stone.id]) || null;
+}
+
+// The summary offered for a stone you haven't claimed: the shared one, else the book's
+function suggestedMaxim(stone) {
+  const e = sharedEntry(stone);
+  return (e && e.maxim) || stone.defaultMaxim;
+}
+
+// What a snapshot holds: each stone you've claimed or written about
+function shareSnapshot() {
+  const stones = {};
+  for (const [id, c] of Object.entries(state.claimed)) {
+    const reflection = (c.reflection || '').trim();
+    if (!STONE_BY_ID[id] || !(isClaimed(id) || reflection)) continue;
+    stones[id] = { ...(isClaimed(id) ? { maxim: c.maxim } : {}), ...(reflection ? { reflection } : {}) };
+  }
+  return stones;
+}
+
+// Put a share key in the address, or take it out (null), keeping the passage
+function setLinkKey(key) {
+  const url = new URL(location.href);
+  if (key) url.searchParams.set('k', key);
+  else url.searchParams.delete('k');
+  history.replaceState(history.state, '', url);
+}
+
+// Your own sharing turned on or off (here, or arriving from another device)
+function setShare(share) {
+  const old = state.share && state.share.key;
+  state.share = share;
+  store('meditations_share_v1', share);
+  if (share.key && (!linkKey() || linkKey() === old)) setLinkKey(share.key);
+  else if (!share.key && old && linkKey() === old) setLinkKey(null);
+}
+
+// The link to the passage you're on, with your share key
+function shareLink() {
+  const url = new URL(location.href);
+  url.search = `?k=${state.share.key}`;
+  return url.href;
 }
 
 function autoResize(el) {

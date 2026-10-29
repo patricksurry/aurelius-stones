@@ -1,10 +1,19 @@
 rules_version = '2';
 // Each signed-in reader has one document, progress/{their uid}, that only they can read or write.
+// A shared snapshot, shared/{random key}, can be read by anyone who has its link; only its owner
+// can create or delete it, and it's never changed (sharing again makes a new one).
 // Paste into Firebase console → Firestore Database → Rules, or deploy with the Firebase CLI.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /progress/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /shared/{key} {
+      allow get: if true;
+      allow create: if request.auth != null
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.keys().hasOnly(['owner', 'stones', 'created']);
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
     }
   }
 }

@@ -18,7 +18,7 @@ When someone shares a link to the app on social media or in chat, the preview co
 - The image is `social/preview.png` (1200×630; keep it under about 300 KB, or WhatsApp skips it). The icons are `social/icon.svg` and `social/apple-touch-icon.png`.
 - To change them, edit `social/preview.html` or `social/icon.svg`, then run `python3 social/render.py`, which redraws the PNGs with headless Chrome.
 - `og:url` and `og:image` must be full URLs on the live site, so update them if the site moves.
-- Every link previews the same way, `#III.6` included. Preview fetchers never see what follows `#`, and they don't run JavaScript. To give each stone its own preview, `build_data.py` would have to write a static page per stone (e.g. `s/<stone-id>/index.html`) carrying that stone's tags and redirecting into the app. No server is needed for that.
+- Every link previews the same way, including `#III.6` and shared `?k=` links. Preview fetchers never see what follows `#`, and they don't run JavaScript. That's deliberate: per-stone previews were tried and dropped as not worth 48 generated pages. The link still opens the right passage.
 - To check a preview after pushing, paste the live URL into a preview checker, such as [opengraph.xyz](https://www.opengraph.xyz/) or LinkedIn's Post Inspector. Platforms cache previews, sometimes for days.
 
 ## Firebase setup
@@ -30,7 +30,7 @@ All of this is in the [Firebase console](https://console.firebase.google.com/pro
 | Sign-in providers | Authentication → Sign-in method | Google; GitHub; Email/Password with **Email link** on. The app has no password form. |
 | GitHub provider | github.com → Settings → Developer settings → OAuth Apps | Callback URL `https://aurelius-stones.firebaseapp.com/__/auth/handler`. The client ID and secret are entered only in Firebase. |
 | Authorized domains | Authentication → Settings | `localhost`, `patricksurry.github.io` (plus Firebase's own two) |
-| Database | Firestore Database | Production mode, rules from `firestore.rules`: each user can read and write only `progress/{uid}` |
+| Database | Firestore Database | Production mode, rules from `firestore.rules`: each user can read and write only `progress/{uid}`; anyone can read a `shared/{key}` snapshot, only its owner can create or delete it |
 | API key restriction | [GCP console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials?project=aurelius-stones) → browser key | Websites `https://patricksurry.github.io/*`, `http://localhost:8765/*`, `https://aurelius-stones.firebaseapp.com/*`. The last one is required, because Firebase's sign-in pages use the key. |
 | Sign-in email | Authentication → Templates | Sent from `noreply@aurelius-stones.firebaseapp.com` |
 
@@ -48,6 +48,18 @@ If you change `firestore.rules`, paste the new version into Firestore → Rules 
 - Changes are saved about 2 seconds after the last edit, and straight away if the tab is hidden.
 - Not synced, kept per browser in `localStorage`: your place in the book, theme, the Greek toggle, and whether you've opened the map.
 - One account per email: if someone who first used one provider tries another with the same email, they're asked to use the first, and the new provider is then linked to the same account.
+
+## How sharing works
+
+A signed-in reader can share their stones from the foot of the map.
+- **Sharing on:** the app makes a random key and writes a snapshot to `shared/{key}`: `{owner, stones, created}`. The snapshot holds the stones you've claimed and your reflections as they are at that moment, but not what you've read. It never changes; to update it, stop sharing and share again, which makes a new key.
+- **Your links carry the key.** While sharing is on, `?k={key}` stays in your address bar, so any link you copy (`…/?k=…#IV.3`) is a personalized one. "copy link" copies the current passage's. The key is kept in `progress/{uid}` (as `share: {key, t}`, latest wins), so your other devices pick it up too.
+- **Opening someone's link** fetches their snapshot without signing in, and it becomes the baseline:
+  - their maxims replace the book's as the suggested ones ("keep as is" and "revert" use them);
+  - their reflections show, marked "shared", above your own;
+  - whatever you claim or write is yours as usual and stays after you "set them aside" (at the foot of the map), which drops the key from the address.
+- **Sharing off** deletes the snapshot. Links with that key then open the plain app, and the key drops out of the address.
+- **Security:** anyone with a link can read that snapshot. Keys are about 60 random bits, and the rules allow fetching a snapshot by key but not listing them. A snapshot contains no name or email.
 
 ## Run locally
 

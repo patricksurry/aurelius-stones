@@ -12,12 +12,30 @@ const ACCOUNT_PROMPT = {
   welcome: 'Reading on another device? Sign in'
 };
 
+// Sharing (see store.js): once signed in, publish a snapshot of your stones and get a link to it;
+// a page opened from someone's link says so, and can let it go
+function shareHtml(place) {
+  if (place !== 'map') return '';
+  if (sharedStones()) {
+    return `<div class="acct-share"><span class="acct-note">Reading with someone's shared stones</span>
+      <button class="quiet-btn" data-acct="leave">set them aside</button></div>`;
+  }
+  if (!account.user || !account.share) return '';
+  if (state.share && state.share.key) {
+    return `<div class="acct-share"><span class="acct-note">Sharing a snapshot of your stones</span>
+      <button class="quiet-btn" data-acct="copy">copy link</button> ·
+      <button class="quiet-btn" data-acct="unshare">stop sharing</button></div>`;
+  }
+  return `<div class="acct-share">
+    <button class="quiet-btn" data-acct="share" title="Anyone with the link can read the stones you've claimed and your reflections, as they are now">share your stones</button></div>`;
+}
+
 function accountHtml(place) {
-  if (!account.ready) return '';
+  if (!account.ready) return shareHtml(place);
   if (account.user) {
     if (place === 'welcome') return '';
-    return `<span class="acct-note">Signed in as ${escapeHtml(account.user)}</span>
-      <button class="quiet-btn" data-acct="out">sign out</button>`;
+    return `<span class="acct-note">${escapeHtml(account.note || `Signed in as ${account.user}`)}</span>
+      <button class="quiet-btn" data-acct="out">sign out</button>${shareHtml(place)}`;
   }
   if (account.mode !== 'idle') {
     const note = account.note || (account.mode === 'confirm' ? 'Confirm your email to finish signing in' : '');
@@ -31,7 +49,7 @@ function accountHtml(place) {
       <button class="acct-icon" data-acct="google" title="Sign in with Google" aria-label="Sign in with Google">${ICONS.google}</button>
       <button class="acct-icon" data-acct="github" title="Sign in with GitHub" aria-label="Sign in with GitHub">${ICONS.github}</button>
       <button class="acct-icon" data-acct="email" title="Sign in with a link by email" aria-label="Sign in by email">${ICONS.email}</button>
-    </span>`;
+    </span>${shareHtml(place)}`;
 }
 
 function accountAction(what, el) {
@@ -40,6 +58,14 @@ function accountAction(what, el) {
   else if (what === 'email') { account.mode = 'email'; account.note = ''; renderAccount(); }
   else if (what === 'cancel') { account.mode = 'idle'; account.note = ''; renderAccount(); }
   else if (what === 'out') account.signOut();
+  else if (what === 'share') account.share();
+  else if (what === 'unshare') account.unshare();
+  else if (what === 'copy') {
+    navigator.clipboard.writeText(shareLink())
+      .then(() => { account.note = 'Link copied'; renderAccount(); setTimeout(() => { account.note = ''; renderAccount(); }, 2500); })
+      .catch(() => { account.note = shareLink(); renderAccount(); });
+  }
+  else if (what === 'leave') { setLinkKey((state.share && state.share.key) || null); render(); if (state.mapOpen) renderMap(); }
   else if (what === 'send') {
     const email = field.value.trim();
     if (!email.includes('@')) { field.focus(); return; }

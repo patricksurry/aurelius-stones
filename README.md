@@ -18,7 +18,7 @@ Each stone also has study notes: A. S. L. Farquharson's commentary,
 George Long's translation, and the historical figures Marcus mentions; the original Greek can sit alongside the English.
 A passage counts as read only after you've spent time with it.
 A progress map shows every passage and stone, and how far you've come.
-Progress stays in your browser; sign in to keep it across devices.
+Progress stays in your browser; sign in to keep it across devices, or to share a snapshot of your stones with a link.
 
 **Keys:** ↑ ↓ passages on a stone · ← → through the book · `f` study · `g` Greek · `m` map
 

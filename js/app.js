@@ -347,6 +347,7 @@ applyTheme();
 document.body.classList.toggle('show-greek', prefs.greek);
 document.body.classList.toggle('map-seen', Boolean(prefs.mapSeen));
 history.replaceState({ ref: state.currentVerseRef }, '', `#${state.currentVerseRef}`);
+if (state.share && state.share.key && !linkKey()) setLinkKey(state.share.key);  // your links carry your share key
 render();
 wake();
 if (!load('meditations_welcomed_v1', false) && !hashRef) showWelcome();

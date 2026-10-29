@@ -148,19 +148,19 @@ function commentaryPara(p, label = '') {
 // once claimed, a way to revise or revert/unclaim
 function maximLineHtml(stone, claimed, earned) {
   if (claimed) {
-    const custom = getStoneHeadline(stone) !== stone.defaultMaxim;
+    const custom = getStoneHeadline(stone) !== suggestedMaxim(stone);
     return `<div class="suggested">
       <button class="quiet-btn" id="editMaxim">${custom ? 'revise' : 'in your own words'}</button> · ${revertHtml(stone, custom)}
     </div>`;
   }
   return `<div class="suggested ${earned ? '' : 'unearned'}" id="ownWordsOffer">
-    <button class="quiet-btn" id="editMaxim">claim in your own words</button> · <button class="quiet-btn" id="claimAsIs">keep as is</button>
+    ${sharedEntry(stone) && sharedEntry(stone).maxim ? '<span class="shared-tag">shared</span> · ' : ''}<button class="quiet-btn" id="editMaxim">claim in your own words</button> · <button class="quiet-btn" id="claimAsIs">keep as is</button>
   </div>`;
 }
 
 function revertHtml(stone, custom = true) {
   return custom
-    ? `<button class="quiet-btn" id="restoreMaxim">revert</button> to “${escapeHtml(stone.defaultMaxim)}”`
+    ? `<button class="quiet-btn" id="restoreMaxim">revert</button> to “${escapeHtml(suggestedMaxim(stone))}”`
     : `<button class="quiet-btn" id="restoreMaxim">unclaim</button>`;
 }
 
@@ -199,6 +199,9 @@ function render() {
 
       <div class="divider"></div>
 
+      ${sharedEntry(stone) && sharedEntry(stone).reflection ? `
+        <p class="shared-reflection"><span class="shared-tag">shared</span> ${escapeHtml(sharedEntry(stone).reflection)}</p>
+      ` : ''}
       <textarea id="reflectionField" class="reflection-input" rows="1"
                 placeholder="Reflections…">${escapeHtml(user.reflection || '')}</textarea>
 
@@ -240,7 +243,7 @@ function render() {
       autoResize(reflectionField);
       const c = state.claimed[stone.id] || {};
       state.claimed[stone.id] = {
-        maxim: c.maxim || stone.defaultMaxim,
+        maxim: isClaimed(stone.id) ? c.maxim : stone.defaultMaxim,
         claimed: isClaimed(stone.id),
         reflection: reflectionField.value.trim(),
         t: Date.now()
@@ -251,7 +254,7 @@ function render() {
     // Update the stone's headline and claimed state, then redraw
     const setMaxim = (words, claim = true) => {
       const c = state.claimed[stone.id] || {};
-      const clean = (words && words.trim()) || stone.defaultMaxim;
+      const clean = (words && words.trim()) || suggestedMaxim(stone);
       state.claimed[stone.id] = {
         maxim: claim ? clean : stone.defaultMaxim,
         claimed: Boolean(claim),
@@ -263,16 +266,16 @@ function render() {
     };
 
     const restore = document.getElementById('restoreMaxim');
-    if (restore) restore.addEventListener('click', () => setMaxim(stone.defaultMaxim, false));
+    if (restore) restore.addEventListener('click', () => setMaxim(suggestedMaxim(stone), false));
 
     const claimAsIs = document.getElementById('claimAsIs');
-    if (claimAsIs) claimAsIs.addEventListener('click', () => setMaxim(stone.defaultMaxim, true));
+    if (claimAsIs) claimAsIs.addEventListener('click', () => setMaxim(suggestedMaxim(stone), true));
 
     // Claiming or revising: the headline becomes a field, with the suggested summary beneath it.
     // Enter keeps what you wrote (or claims the suggested summary if left blank); Esc cancels.
     const startEditingMaxim = () => {
       if (window.getSelection && window.getSelection().toString()) return;
-      const custom = claimed && getStoneHeadline(stone) !== stone.defaultMaxim;
+      const custom = claimed && getStoneHeadline(stone) !== suggestedMaxim(stone);
       const wrap = surface.querySelector('.maxim-wrap');
       wrap.innerHTML = `
         <textarea class="maxim editing" id="maximField" rows="1" spellcheck="false"
@@ -280,7 +283,7 @@ function render() {
         <div class="suggested">
           ${claimed
             ? revertHtml(stone, custom)
-            : `suggested: “${escapeHtml(stone.defaultMaxim)}” · <button class="quiet-btn" id="keepSuggested">keep as is</button>`}
+            : `suggested: “${escapeHtml(suggestedMaxim(stone))}” · <button class="quiet-btn" id="keepSuggested">keep as is</button>`}
         </div>`;
       const field = document.getElementById('maximField');
       let cancelled = false;
@@ -297,18 +300,18 @@ function render() {
         if (cancelled) { render(); return; }
         const words = field.value.trim();
         if (words) setMaxim(words, true);
-        else if (enterPressed && !claimed) setMaxim(stone.defaultMaxim, true);
+        else if (enterPressed && !claimed) setMaxim(suggestedMaxim(stone), true);
         else render();
       });
       const use = document.getElementById('restoreMaxim');
       if (use) {
         use.addEventListener('mousedown', (e) => e.preventDefault());
-        use.addEventListener('click', () => { cancelled = true; setMaxim(stone.defaultMaxim, false); });
+        use.addEventListener('click', () => { cancelled = true; setMaxim(suggestedMaxim(stone), false); });
       }
       const keep = document.getElementById('keepSuggested');
       if (keep) {
         keep.addEventListener('mousedown', (e) => e.preventDefault());
-        keep.addEventListener('click', () => { cancelled = true; setMaxim(stone.defaultMaxim, true); });
+        keep.addEventListener('click', () => { cancelled = true; setMaxim(suggestedMaxim(stone), true); });
       }
     };
 

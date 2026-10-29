@@ -971,6 +971,30 @@ body.idle .chrome-soft:not(:hover) {
   font-style: italic;
 }
 
+/* Sharing sits on its own line under the sign-in line */
+.acct-share {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+}
+
+/* Maxims and reflections from someone's shared link */
+.shared-tag {
+  font-style: italic;
+  color: var(--stone-fill-claimed);
+}
+
+.shared-reflection {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--ink-faint);
+  white-space: pre-wrap;
+  margin-bottom: 0.75rem;
+}
+
 .acct-icons {
   display: inline-flex;
   gap: 0.35rem;

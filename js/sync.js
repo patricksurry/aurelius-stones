@@ -1,5 +1,6 @@
 // Optional cross-device sync: sign in with Google, GitHub or an emailed link, and your progress is kept
 // in Firestore at progress/{uid}, readable only by you (see firestore.rules).
+// Sharing (see store.js) publishes a snapshot at shared/{key}, readable by anyone with the link.
 // Reading needs no account; account.js shows the sign-in choices this module provides.
 // It talks to index.html through progressSnapshot(), mergeProgress(), the
 // 'progress' event and the account object, defined in store.js.
@@ -88,12 +89,67 @@ async function signInWith(id) {
   }
 }
 
+const firestore = () => import('https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js');
+
+// About 60 random bits, in letters and digits: unguessable, and short enough for a link
+function newKey() {
+  const abc = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from(crypto.getRandomValues(new Uint8Array(11)), b => abc[b % abc.length]).join('');
+}
+
+async function share() {
+  const { getFirestore, doc, setDoc, serverTimestamp } = await firestore();
+  const key = newKey();
+  try {
+    await setDoc(doc(getFirestore(app), 'shared', key),
+      { owner: auth.currentUser.uid, stones: shareSnapshot(), created: serverTimestamp() });
+  } catch (e) {
+    console.warn('Sharing failed', e);
+    show({ note: 'Sharing didn’t work; try again' });
+    return;
+  }
+  setShare({ key, t: Date.now() });
+  save();
+  show({ note: '' });
+}
+
+async function unshare() {
+  const { getFirestore, doc, deleteDoc } = await firestore();
+  const key = state.share && state.share.key;
+  if (key) await deleteDoc(doc(getFirestore(app), 'shared', key)).catch(e => console.warn('Unsharing failed', e));
+  setShare({ key: null, t: Date.now() });
+  save();
+  renderAccount();
+}
+
+// Opened from someone's link: fetch their snapshot (no sign-in needed). If it's gone, drop the key.
+async function loadShared() {
+  const key = linkKey();
+  if (!key || key === (state.share && state.share.key)) return;
+  const { getFirestore, doc, getDoc } = await firestore();
+  try {
+    const snap = await getDoc(doc(getFirestore(app), 'shared', key));
+    if (snap.exists()) {
+      state.baseline = { key, stones: snap.data().stones || {} };
+      store('meditations_baseline_v1', state.baseline);
+    } else {
+      setLinkKey(null);
+    }
+    refresh();
+    if (state.mapOpen) renderMap();
+  } catch (e) {
+    console.warn('Loading the shared stones failed', e);
+  }
+}
+
 Object.assign(account, {
   ready: true,
   signIn: signInWith,
   sendLink,
   confirm: finishEmailLink,
-  signOut: () => signOut(auth)
+  signOut: () => signOut(auth),
+  share,
+  unshare
 });
 
 // Re-rendering the stone would interrupt someone typing, so then only the progress updates
@@ -104,8 +160,7 @@ function refresh() {
 }
 
 async function startSync(user) {
-  const { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } =
-    await import('https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js');
+  const { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } = await firestore();
   const ref = doc(getFirestore(app), 'progress', user.uid);
   let loaded = false;
 
@@ -160,3 +215,5 @@ if (isSignInWithEmailLink(auth, location.href)) {
     show({ mode: 'confirm', note: '' });
   }
 }
+
+loadShared();
