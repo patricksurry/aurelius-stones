@@ -1293,10 +1293,10 @@ body.idle .chrome-soft:not(:hover) {
   color: var(--ink-faint);
 }
 
+/* Two newspaper columns (down, then across), so a two-line maxim doesn't leave a gap beside it */
 .map-stone-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem 1.75rem;
+  columns: 2;
+  column-gap: 1.75rem;
 }
 
 .map-stone-item {
@@ -1304,6 +1304,8 @@ body.idle .chrome-soft:not(:hover) {
   flex-direction: column;
   gap: 0.3rem;
   min-width: 0;
+  break-inside: avoid;
+  margin-bottom: 0.65rem;
 }
 
 .map-stone-row {
@@ -1558,9 +1560,11 @@ body.idle .chrome-soft:not(:hover) {
     grid-template-columns: 1fr;
     gap: 0.65rem;
   }
-  .related,
-  .map-stone-list {
+  .related {
     grid-template-columns: 1fr;
+  }
+  .map-stone-list {
+    columns: 1;
   }
   /* The header's menus span the header, so they never run off the screen */
   .horizon {
