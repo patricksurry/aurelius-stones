@@ -118,6 +118,32 @@ function incipit(v) {
   return words.length > 14 ? words.slice(0, 14).join(' ') + '…' : words.join(' ');
 }
 
+// Long blocks on the study side show their first lines and fade; "more" opens the rest.
+// A block only a few lines over the limit is left whole.
+function clampLongBlocks(root) {
+  root.querySelectorAll('.clamp').forEach(el => {
+    if (el.scrollHeight - el.clientHeight < 80) {
+      el.classList.remove('clamp');
+      return;
+    }
+    const more = document.createElement('button');
+    more.className = 'quiet-btn clamp-more';
+    more.textContent = 'more';
+    more.addEventListener('click', () => {
+      el.classList.remove('clamp');
+      more.remove();
+    });
+    el.after(more);
+  });
+}
+
+// A paragraph of Farquharson's: prose, or a verse quotation ("> line / line")
+function commentaryPara(p, label = '') {
+  return p.startsWith('> ')
+    ? `${label}<blockquote class="study-quote">${p.slice(2).split(' / ').map(escapeHtml).join('<br>')}</blockquote>`
+    : `<p>${label}${escapeHtml(p)}</p>`;
+}
+
 // Under the headline: an offer to claim the stone in your own words or keep the suggested summary as-is;
 // once claimed, a way to revise or revert/unclaim
 function maximLineHtml(stone, claimed, earned) {
@@ -294,9 +320,19 @@ function render() {
     // Farquharson's commentary and the people named (see raw/SOURCES.md).
     const book = bookOf(activeV);
     const stoneVerses = stone.verseIds.map(id => VERSE_BY_ID[id]);
+    // On phones, a row of links jumps to each section of a long study side
+    const jumps = [
+      ['studyLong', 'Long'],
+      activeV.commentary.length && ['studyNotes', 'Commentary'],
+      activeV.people.length && ['studyPeople', 'People'],
+      book.intro.length && ['studyBook', `Book ${book.roman}`],
+    ].filter(Boolean);
     surface.innerHTML = `
       <div class="study-ref">${escapeHtml(stone.discipline)}</div>
       <div class="study-title">“${escapeHtml(getStoneHeadline(stone))}”</div>
+      <nav class="study-jump" aria-label="Sections">
+        ${jumps.map(([id, name]) => `<button class="quiet-btn" data-jump="${id}">${name}</button>`).join('')}
+      </nav>
 
       <section class="study-section study-passages">
         <h2 class="study-head">Passages on this stone · Farquharson, 1944</h2>
@@ -320,17 +356,17 @@ function render() {
         </div>
       </section>
 
-      <section class="study-section">
+      <section class="study-section" id="studyLong">
         <h2 class="study-head">George Long's translation, 1862</h2>
-        <p>${escapeHtml(activeV.long)}</p>
+        <div class="clamp"><p>${escapeHtml(activeV.long)}</p></div>
       </section>
 
       ${activeV.commentary.length ? `
-        <section class="study-section">
+        <section class="study-section" id="studyNotes">
           <h2 class="study-head">Farquharson's commentary</h2>
-          ${activeV.commentary.map(c => c.paragraphs.map((p, i) => `
-            <p>${i === 0 ? `<span class="study-label">${escapeHtml(c.label)}</span>` : ''}${escapeHtml(p)}</p>
-          `).join('')).join('')}
+          ${activeV.commentary.map(c => `<div class="clamp">${c.paragraphs.map((p, i) =>
+            commentaryPara(p, i === 0 ? `<span class="study-label">${escapeHtml(c.label)}</span>` : '')
+          ).join('')}</div>`).join('')}
         </section>
       ` : ''}
 
@@ -346,11 +382,9 @@ function render() {
       ` : ''}
 
       ${book.intro.length ? `
-        <section class="study-section">
-          <details>
-            <summary>Farquharson on Book ${book.roman}${book.heading ? ` · ${escapeHtml(book.heading)}` : ''}</summary>
-            ${book.intro.map(p => `<p>${escapeHtml(p)}</p>`).join('')}
-          </details>
+        <section class="study-section" id="studyBook">
+          <h2 class="study-head">Farquharson on Book ${book.roman}${book.heading ? ` · ${escapeHtml(book.heading)}` : ''}</h2>
+          <div class="clamp">${book.intro.map(p => commentaryPara(p)).join('')}</div>
         </section>
       ` : ''}
 
@@ -379,6 +413,12 @@ function render() {
     surface.querySelectorAll('.study-verse-line[data-ref]').forEach(el => {
       el.addEventListener('click', () => goToVerse(el.getAttribute('data-ref'), false, true));
     });
+
+    surface.querySelectorAll('[data-jump]').forEach(el => {
+      el.addEventListener('click', () => document.getElementById(el.dataset.jump).scrollIntoView({ behavior: 'smooth' }));
+    });
+
+    clampLongBlocks(surface);
 
     document.getElementById('greekToggle').addEventListener('click', toggleGreek);
   }
