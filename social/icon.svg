@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- A touchstone: the app's claimed-stone colours -->
+  <rect width="64" height="64" rx="14" fill="#f3f0e8"/>
+  <path d="M10 35c0-12 10-21 23-21s21 8 21 19-10 19-23 19S10 46 10 35z" fill="#9a7b66" stroke="#7d6252" stroke-width="2"/>
+</svg>

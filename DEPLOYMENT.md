@@ -12,6 +12,15 @@ Before pushing:
 - after changing CSS or JS, run `python3 stamp.py`. It puts a hash of each file's contents into its link in `index.html`, so browsers don't mix a new page with stale cached files.
 - after changing anything that feeds the dataset, run `python3 build_data.py`. It rewrites `data/meditations.js`, then stamps everything the same way.
 
+## Link previews
+
+When someone shares a link to the app on social media or in chat, the preview comes from tags in the `<head>` of `index.html`: a description, Open Graph tags (`og:*`, used by almost every platform) and `twitter:card` for X.
+- The image is `social/preview.png` (1200×630; keep it under about 300 KB, or WhatsApp skips it). The icons are `social/icon.svg` and `social/apple-touch-icon.png`.
+- To change them, edit `social/preview.html` or `social/icon.svg`, then run `python3 social/render.py`, which redraws the PNGs with headless Chrome.
+- `og:url` and `og:image` must be full URLs on the live site, so update them if the site moves.
+- Every link previews the same way, `#III.6` included. Preview fetchers never see what follows `#`, and they don't run JavaScript. To give each stone its own preview, `build_data.py` would have to write a static page per stone (e.g. `s/<stone-id>/index.html`) carrying that stone's tags and redirecting into the app. No server is needed for that.
+- To check a preview after pushing, paste the live URL into a preview checker, such as [opengraph.xyz](https://www.opengraph.xyz/) or LinkedIn's Post Inspector. Platforms cache previews, sometimes for days.
+
 ## Firebase setup
 
 All of this is in the [Firebase console](https://console.firebase.google.com/project/aurelius-stones), on the free Spark plan with no billing. The web app's config, which is public by design, is in `js/sync.js`.
