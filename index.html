@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2b1bf06962">
+  <link rel="stylesheet" href="css/style.css?v=2438ca1399">
 </head>
 <body>
 
@@ -35,7 +35,17 @@
       </span>
       <span class="progress-caption" id="progressLabel"></span>
     </button>
-    <button class="quiet-btn chrome theme-btn" id="themeToggle"></button>
+    <span class="horizon-tools chrome">
+      <span class="menu-wrap" id="shareWrap" hidden>
+        <button class="quiet-btn tool-btn" id="shareBtn" title="Share your stones" aria-label="Share your stones" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="menu account" data-place="share" id="shareMenu" hidden></div>
+      </span>
+      <span class="menu-wrap">
+        <button class="quiet-btn tool-btn" id="accountBtn" title="Sign in and progress" aria-label="Sign in and progress" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="menu account" data-place="menu" id="accountMenu" hidden></div>
+      </span>
+      <button class="quiet-btn tool-btn" id="themeToggle"></button>
+    </span>
   </header>
 
   <main class="stone-wrapper">
@@ -65,9 +75,9 @@
   <script src="data/meditations.js?v=c5ac65c66c"></script>
   <script src="js/store.js?v=5b24b0b72b"></script>
   <script src="js/card.js?v=6d22f360f5"></script>
-  <script src="js/map.js?v=fc6e532d02"></script>
-  <script src="js/account.js?v=f14f876fcd"></script>
-  <script src="js/app.js?v=5af04ff592"></script>
-  <script type="module" src="js/sync.js?v=23dc5bf927"></script>
+  <script src="js/map.js?v=43e3450517"></script>
+  <script src="js/account.js?v=463aa7ea00"></script>
+  <script src="js/app.js?v=99f708cdc5"></script>
+  <script type="module" src="js/sync.js?v=09ae285ea5"></script>
 </body>
 </html>

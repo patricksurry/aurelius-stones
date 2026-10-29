@@ -291,6 +291,7 @@ window.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Escape') {
+    if (closeMenus()) return;
     if (state.mapOpen) toggleMap();
     else if (state.flipped) flipStone();
     return;
@@ -314,7 +315,7 @@ window.addEventListener('popstate', (e) => {
   const wantStudy = Boolean(st.study);
   if (state.mapOpen !== wantMap) {
     state.mapOpen = wantMap;
-    confirmingClear = false;
+    closeMenus();
     renderMap();
   }
   if (targetRef !== state.currentVerseRef) {

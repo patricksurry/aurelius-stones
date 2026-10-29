@@ -1,5 +1,5 @@
 // The progress map: every passage by book and every stone by discipline, linked on hover,
-// with sign-in and "clear progress" at its foot.
+// with a note at its foot when this page came from someone's shared link.
 
 const DISCIPLINES = [
   { id: 'Judgment', hint: 'How to judge' },
@@ -8,21 +8,6 @@ const DISCIPLINES = [
 ];
 
 const CLOSE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>';
-
-// Clearing asks first, in place
-let confirmingClear = false;
-
-function clearHtml(claimedCount) {
-  if (!state.read.size && !claimedCount) return '';
-  if (!confirmingClear) return '<button class="quiet-btn" id="clearAsk">clear progress</button>';
-  const what = [
-    state.read.size ? `${state.read.size} passage${state.read.size === 1 ? '' : 's'} read` : '',
-    claimedCount ? `${claimedCount} stone${claimedCount === 1 ? '' : 's'} claimed` : ''
-  ].filter(Boolean).join(' and ');
-  return `<span class="acct-note">Forget ${what}${account.user ? ', on every device' : ''}?</span>
-    <button class="quiet-btn" id="clearYes">clear</button>
-    <button class="quiet-btn" id="clearNo">keep</button>`;
-}
 
 function stonesListHtml(current) {
   const today = todayStone();
@@ -124,7 +109,6 @@ function renderMap() {
 
       <div class="map-foot">
         <div class="account" data-place="map"></div>
-        <div class="map-clear">${clearHtml(claimedCount)}</div>
       </div>
     </div>
   `;
@@ -139,10 +123,6 @@ function renderMap() {
     });
   });
   renderAccount();
-  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
-  on('clearAsk', () => { confirmingClear = true; renderMap(); });
-  on('clearNo', () => { confirmingClear = false; renderMap(); });
-  on('clearYes', () => { confirmingClear = false; clearProgress(); render(); renderMap(); });
 
   // In book view, pointing at a passage shows its opening and lights its stone; pointing at a stone lights its passages.
   // In stone view, pointing at a passage circle shows its opening lines beside it.
@@ -243,7 +223,7 @@ function renderMap() {
 
 function toggleMap() {
   state.mapOpen = !state.mapOpen;
-  confirmingClear = false;
+  closeMenus();
   // Until the map has been opened once, the progress line wears its caption
   if (state.mapOpen && !prefs.mapSeen) {
     prefs.mapSeen = true;

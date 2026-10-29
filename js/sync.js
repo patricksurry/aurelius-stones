@@ -200,7 +200,6 @@ onAuthStateChanged(auth, (user) => {
   stopSync();
   // (Signed out, keep any "confirm your email" step from a sign-in link in progress)
   show({ user: user ? (user.email || user.displayName || 'you') : null, ...(user ? { mode: 'idle', note: '' } : {}) });
-  if (state.mapOpen) renderMap();  // "on every device" in the clear prompt depends on this
   if (user) startSync(user);
 });
 
@@ -211,8 +210,8 @@ if (isSignInWithEmailLink(auth, location.href)) {
   if (email) {
     finishEmailLink(email);
   } else {
-    if (!state.mapOpen) toggleMap();
     show({ mode: 'confirm', note: '' });
+    openMenu('accountMenu');
   }
 }
 

@@ -62,7 +62,8 @@ body.idle .chrome {
 }
 
 body.idle .chrome:hover,
-body.idle .chrome:focus-within {
+body.idle .chrome:focus-within,
+body.idle .chrome:has(.menu:not([hidden])) {
   opacity: 1;
 }
 
@@ -93,14 +94,35 @@ body.idle .chrome:focus-within {
   margin-bottom: 1rem;
 }
 
-.theme-btn {
+/* Right of the progress lines: share (once signed in), account, theme */
+.horizon-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.tool-btn {
   display: inline-flex;
   padding: 0.35rem;
 }
 
-.theme-btn svg {
+.tool-btn svg {
   width: 22px;
   height: 22px;
+}
+
+.tool-btn.on,
+.tool-btn[aria-expanded="true"] {
+  color: var(--ink-mid);
+}
+
+.menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.menu-wrap[hidden] {
+  display: none;
 }
 
 /* Two hairlines: stones claimed (warm) over passages read; opens the map */
@@ -958,8 +980,7 @@ body.idle .chrome-soft:not(:hover) {
 }
 
 /* Sign-in: a quiet line and three small icons */
-.account,
-.map-clear {
+.account {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -971,13 +992,44 @@ body.idle .chrome-soft:not(:hover) {
   font-style: italic;
 }
 
-/* Sharing sits on its own line under the sign-in line */
-.acct-share {
-  flex-basis: 100%;
+/* The header's menus drop below their buttons, right-aligned */
+.menu.account {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 20;
+  width: max-content;
+  max-width: min(21rem, calc(100vw - 2rem));
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--stone-bg);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.menu.account[hidden] {
+  display: none;
+}
+
+.menu-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.6rem;
+}
+
+.menu .acct-note {
+  margin: 0;
+}
+
+/* The map's foot only appears to say a shared link is in use */
+.map-foot:has(.account:empty) {
+  display: none;
 }
 
 /* Maxims and reflections from someone's shared link */
@@ -1509,6 +1561,19 @@ body.idle .chrome-soft:not(:hover) {
   .related,
   .map-stone-list {
     grid-template-columns: 1fr;
+  }
+  /* The header's menus span the header, so they never run off the screen */
+  .horizon {
+    position: relative;
+  }
+  .menu-wrap {
+    position: static;
+  }
+  .menu.account {
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
   }
   .study-jump {
     display: flex;

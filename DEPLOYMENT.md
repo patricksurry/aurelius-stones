@@ -51,13 +51,13 @@ If you change `firestore.rules`, paste the new version into Firestore → Rules 
 
 ## How sharing works
 
-A signed-in reader can share their stones from the foot of the map.
+A signed-in reader can share their stones from the share icon in the header, which appears once they're signed in. Sign-in, sign-out and "clear progress" are in the person icon's menu beside it.
 - **Sharing on:** the app makes a random key and writes a snapshot to `shared/{key}`: `{owner, stones, created}`. The snapshot holds the stones you've claimed and your reflections as they are at that moment, but not what you've read. It never changes; to update it, stop sharing and share again, which makes a new key.
 - **Your links carry the key.** While sharing is on, `?k={key}` stays in your address bar, so any link you copy (`…/?k=…#IV.3`) is a personalized one. "copy link" copies the current passage's. The key is kept in `progress/{uid}` (as `share: {key, t}`, latest wins), so your other devices pick it up too.
 - **Opening someone's link** fetches their snapshot without signing in, and it becomes the baseline:
   - their maxims replace the book's as the suggested ones ("keep as is" and "revert" use them);
   - their reflections show, marked "shared", above your own;
-  - whatever you claim or write is yours as usual and stays after you "set them aside" (at the foot of the map), which drops the key from the address.
+  - whatever you claim or write is yours as usual and stays after you "set them aside" (a note at the foot of the map offers it), which drops the key from the address.
 - **Sharing off** deletes the snapshot. Links with that key then open the plain app, and the key drops out of the address.
 - **Security:** anyone with a link can read that snapshot. Keys are about 60 random bits, and the rules allow fetching a snapshot by key but not listing them. A snapshot contains no name or email.
 
