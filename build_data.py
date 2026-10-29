@@ -12,7 +12,7 @@ import os
 import re
 import xml.etree.ElementTree as ET
 
-from sources import load_commentary, load_long
+from sources import check_errata, correct, load_commentary, load_long
 from stamp import stamp
 from verify import verify
 
@@ -111,6 +111,7 @@ def load_aligned_verses():
             eng = re.sub(r"\s*Footnotes\b.*$", "", eng)
             eng = re.sub(r"\s*BOOK [IVX]+\s*$", "", eng).strip()
             ref = f"{ROMAN[b]}.{n}"
+            eng = correct("Farquharson", ref, eng)
             verses.append({
                 "id": ref,
                 "book": b,
@@ -194,6 +195,7 @@ def main():
     verses = load_aligned_verses()
     stones = load_stones(verses)
     book_intros = attach_sources(verses)
+    check_errata()
     people = link_people(verses)
     affinities = load_affinities()
 

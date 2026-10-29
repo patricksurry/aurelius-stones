@@ -1,6 +1,6 @@
 # Sources
 
-Every text in the app comes from one of the sources below. A copy of each is archived in this folder, so the dataset can be rebuilt (`python3 build_data.py`) without network access, and the exact versions used can be traced. All files were retrieved on 2026-10-25.
+Every text in the app comes from one of the sources below. A copy of each is archived in this folder, so the dataset can be rebuilt (`python3 build_data.py`) without network access, and the exact versions used can be traced. All files were retrieved on 2026-10-25. A few transcription errors in them are corrected at build time; see [`ERRATA.md`](../ERRATA.md).
 
 ## Greek text: Leopold (Teubner, 1908)
 

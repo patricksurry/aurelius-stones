@@ -8,6 +8,7 @@ load_long():        George Long's 1862 translation, {book: {section: text}}.
                     Leopold splits V.36 in two.
 load_commentary():  A. S. L. Farquharson's 1944 commentary, per book:
                     {"intro": [paragraphs], "notes": [{"label", "chapters", "paragraphs"}]}.
+correct():          applies the transcription corrections listed in ERRATA.md.
 """
 
 import html
@@ -18,6 +19,39 @@ import re
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]
 RAW = os.path.join(os.path.dirname(os.path.abspath(__file__)), "raw")
 PATH = f"{RAW}/gutenberg/long_pg15877.txt"
+ERRATA_PATH = os.path.join(os.path.dirname(RAW), "ERRATA.md")
+
+
+def load_errata():
+    """The rows of the Corrections table in ERRATA.md."""
+    rows, in_table = [], False
+    with open(ERRATA_PATH, encoding="utf-8") as f:
+        for ln in f:
+            if ln.startswith("## "):
+                in_table = ln.strip() == "## Corrections"
+            elif in_table and ln.startswith("|") and not re.match(r"^\|\s*(Text|-)", ln):
+                cells = [c.strip().strip("`") for c in ln.strip().strip("|").split("|")]
+                rows.append(dict(zip(("text", "where", "reads", "should", "evidence"), cells)))
+    return rows
+
+
+ERRATA = load_errata()
+
+
+def correct(text, where, s):
+    """Apply ERRATA.md's corrections for one text ('Farquharson', 'Commentary' or 'Long') at one place."""
+    for e in ERRATA:
+        if e["text"] == text and e["where"].split()[0] == where and e["reads"] in s:
+            assert s.count(e["reads"]) == 1, f"ERRATA.md: {e['reads']!r} is ambiguous in {text} {where}"
+            s = s.replace(e["reads"], e["should"])
+            e["applied"] = True
+    return s
+
+
+def check_errata():
+    """Every correction must have found its text, or the source has changed under it."""
+    missed = [f"{e['text']} {e['where']}: {e['reads']!r}" for e in ERRATA if not e.get("applied")]
+    assert not missed, "ERRATA.md corrections that matched nothing:\n  " + "\n  ".join(missed)
 
 
 def load_long():
@@ -79,9 +113,9 @@ def load_long():
         clean = {}
         for k, v in sections.items():
             v = re.sub(r"\[[A-Z]\]", "", v)            # footnote markers
-            v = re.sub(r"\s*\+", "", v)                # Long's obelus (+) for corrupt Greek
+            v = v.replace("+", "")                     # Long's obelus (+) for corrupt Greek
             v = re.sub(r"\s+", " ", v).strip()
-            clean[k] = v
+            clean[k] = correct("Long", f"{ROMAN[b - 1]}.{k}", v)
         books[b] = clean
 
     # Long's indexes follow the last section of Book XII
@@ -114,12 +148,28 @@ def load_commentary():
         with open(f"{RAW}/wikisource/farquharson_commentary_{b}.json", encoding="utf-8") as f:
             text = json.load(f)["parse"]["text"]
         text = re.sub(r"<style.*?</style>", "", text, flags=re.S)
-        text = re.sub(r'<sup[^>]*class="reference".*?</sup>', "", text, flags=re.S)   # footnote markers
+        text = re.sub(r"\s+", " ", text)  # line breaks in the HTML source are not paragraph breaks
+        # Footnote markers; a few sit between a full stop and the next sentence with no space around them
+        text = re.sub(r'<sup[^>]*class="reference"(?:(?!</sup>).)*</sup>(?=[A-Za-z])', " ", text)
+        text = re.sub(r'<sup[^>]*class="reference".*?</sup>', "", text)
         text = re.sub(r'<span[^>]*class="pagenum[^"]*".*?</span>', "", text, flags=re.S)  # page numbers
+        # Verse quotations sit in centred blocks: keep each as one paragraph, "> " then its lines joined by " / ".
+        # Centred all-caps lines are headings ("BOOK IV"), not verse.
+        def centred(m):
+            if not re.search(r"[a-z]", re.sub(r"<[^>]+>", "", m.group(1))):
+                return m.group(1)
+            return "<p>> " + re.sub(r"</p>|<br\s*/?>", " / ", m.group(1)) + "</p>"
+        text = re.sub(r'<div class="wst-(?:block-)?center[^"]*"[^>]*>(.*?)</div>', centred, text)
         text = re.sub(r"</p>|<br\s*/?>|</div>|</li>", "\n", text)
         text = html.unescape(re.sub(r"<[^>]+>", "", text)).replace("​", "")
         paras = [re.sub(r"\s+", " ", p).strip() for p in text.split("\n")]
         paras = [p for p in paras if p]
+        paras = [("> " + " / ".join(ln for ln in re.split(r"\s*(?:^|\s)/(?:\s|$)\s*", p[2:]) if ln)) if p.startswith("> ") else p
+                 for p in paras]
+        for i in range(len(paras) - 1, 0, -1):  # consecutive quotations are one passage of verse
+            if paras[i].startswith("> ") and paras[i - 1].startswith("> "):
+                paras[i - 1] += " / " + paras.pop(i)[2:]
+        paras = [correct("Commentary", ROMAN[b - 1], p) for p in paras]
 
         # Body runs from the "BOOK N" heading to the footnotes section ("Footnotes[edit]" or lines starting with ↑)
         start = next(i for i, p in enumerate(paras) if re.fullmatch(r"BOOK [IVX]+", p)) + 1
